@@ -21,7 +21,10 @@ export class SpriteRenderer {
   queue: DrawCmd[] = [];
   dataview: DataView;
 
-  constructor(private canvas: HTMLCanvasElement) {
+  constructor(
+    private canvas: HTMLCanvasElement,
+    private pixelSize = 4,
+  ) {
     this.gl = this.canvas.getContext("webgl2")!;
     const gl = this.gl;
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -69,8 +72,7 @@ export class SpriteRenderer {
     gl.vertexAttribPointer(centerAttribLocation, 2, gl.FLOAT, false, stride, 8 * 4);
 
     const resUniformLocation = gl.getUniformLocation(program, "u_resolution");
-    const pixelSize = 4;
-    gl.uniform2f(resUniformLocation, canvas.width / pixelSize, canvas.height / pixelSize);
+    gl.uniform2f(resUniformLocation, canvas.width / this.pixelSize, canvas.height / this.pixelSize);
 
     //const textureUniformLocation = gl.getUniformLocation(program, "u_texture");
     const texture = gl.createTexture()!;
@@ -265,7 +267,7 @@ void main() {
 
   vec2 position = (a_center + a_scale * rotpos) / u_resolution * 2.0 - 1.0;
   gl_Position = vec4(position.x, -position.y, 0, 1);
-  v_texcoord = a_texcoord / 128.0;
+  v_texcoord = a_texcoord / 256.0;
   v_alpha = a_alpha;
   v_flash = a_flash;
 }

@@ -57,8 +57,8 @@ export function drawText(renderer: SpriteRenderer, x: number, y: number, text: s
       sprite = parseInt(numberString);
       i = end;
     }
-    const sy = (sprite / 16) | 0;
-    const sx = sprite % 16;
+    const sy = (sprite / 32) | 0;
+    const sx = sprite % 32;
     renderer.drawSprite(x + count * 7, y, sx * 8, sy * 8, 8, 8);
     count++;
   }
@@ -68,4 +68,16 @@ export function drawSprite(renderer: SpriteRenderer, x: number, y: number, sprit
   const sy = (sprite / 16) | 0;
   const sx = sprite % 16;
   renderer.drawSprite(x, y, sx * 8, sy * 8, 8, 8);
+}
+
+export function drawSprite2(
+  renderer: SpriteRenderer,
+  x: number,
+  y: number,
+  sprite: number,
+  alpha = 1,
+) {
+  const sy = (sprite / 16) | 0;
+  const sx = sprite % 16;
+  renderer.drawSprite(x, y, sx * 16, sy * 16, 16, 16, alpha);
 }
