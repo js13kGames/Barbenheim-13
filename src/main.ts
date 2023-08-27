@@ -3,9 +3,13 @@ import { createCanvas, gameLoop, loadImage } from "./engine/gl-util.ts";
 import { SpriteRenderer } from "./engine/SpriteRenderer.ts";
 import { drawSprite2 } from "./engine/renderUtils.ts";
 import { TileMap } from "./engine/tilemap.ts";
-import { Cursor, Game } from "./game/game.ts";
+import { Game } from "./game/game.ts";
 import { generateLevel } from "./game/levelGenerator.ts";
 import { findPath } from "./engine/findPath.ts";
+import { SpriteComponent } from "./game/components.ts";
+import { inputSystem } from "./game/inputSystem.ts";
+import { moveSystem } from "./game/moveSystem.ts";
+import { enemySystem } from "./game/enemySystem.ts";
 
 const pixelSize = 4;
 const canvas = createCanvas(1920, 1080);
@@ -29,38 +33,15 @@ canvas.addEventListener("click", () => {
 
 const tilemap = new TileMap(30, 16);
 generateLevel(tilemap);
+game.tilemap = tilemap;
 
 game.init();
 
 function update() {
   game.t++;
-  game.queue.forEach((event) => {
-    if (event.type === "click") {
-      game.activePlayer = null;
-      const pos: Cursor = event.pos;
-      game.ecs.getComponentsByType("player").forEach((player) => {
-        const sprite = game.ecs.getComponent<SpriteComponent>(player.entity, "sprite")!;
-        if (
-          ((sprite.x / 16) | 0) === ((pos.x / 16) | 0) &&
-          ((sprite.y / 16) | 0) === ((pos.y / 16) | 0)
-        ) {
-          game.activePlayer = player.entity;
-        }
-      });
-    }
-  });
-  game.queue.length = 0;
-}
-
-interface SpriteComponent {
-  type: "sprite";
-  x: number;
-  y: number;
-  sprite: number;
-}
-
-interface PlayerComponent {
-  type: "player";
+  inputSystem(game);
+  enemySystem(game);
+  moveSystem(game);
 }
 
 function render() {
@@ -98,6 +79,18 @@ function render() {
       drawSprite2(renderer, p.x * 16, p.y * 16, idx < 5 ? 16 * 2 + 3 : 16 * 2 + 5);
       if (idx === 4 || (idx === path.length - 1 && idx < 5)) {
         drawSprite2(renderer, p.x * 16, p.y * 16, 16 * 2 + 6, 0.5 + Math.sin(t / 10) / 4);
+      }
+
+      const foe = game.ecs.getComponentsByType("foe").find((player) => {
+        const sprite = game.ecs.getComponent<SpriteComponent>(player.entity, "sprite")!;
+        return ((sprite.x / 16) | 0) === (p.x | 0) && ((sprite.y / 16) | 0) === (p.y | 0);
+      });
+
+      if (foe) {
+        const prev = path[idx - 1] ?? { x: playerSprite.x / 16, y: playerSprite.y / 16 };
+        const mix = 0.5 + (0.5 * Math.sin(t / 10)) / 4;
+        const mid = { x: mix * prev.x + (1 - mix) * p.x, y: mix * prev.y + (1 - mix) * p.y };
+        drawSprite2(renderer, mid.x * 16, mid.y * 16, 16 * 2 + 11);
       }
     });
   }
