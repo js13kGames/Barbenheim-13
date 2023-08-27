@@ -11,21 +11,24 @@ export function moveSystem(game: Game) {
   game.ecs.getComponentsByType<MoveComponent>("move").forEach((move) => {
     const sprite = game.ecs.getComponent<SpriteComponent>(move.entity, "sprite")!;
     const path = move.path;
-    const next = path[move.idx++];
-    sprite.x = next.x * 16;
-    sprite.y = next.y * 16;
-
-    if (move.idx >= path.length) {
-      game.ecs.removeComponent(move.entity, move);
+    const next = path[move.idx];
+    sprite.x += Math.sign(next.x * 16 - sprite.x);
+    sprite.y += Math.sign(next.y * 16 - sprite.y);
+    if (sprite.x === next.x * 16 && sprite.y === next.y * 16) {
+      move.idx++;
+      if (move.idx >= path.length) {
+        game.ecs.removeComponent(move.entity, move);
+      }
     }
   });
 
   const openMoves = game.ecs.getComponentsByType(game.side).filter((c) => {
     return !(c as any as PlayerComponent).moved;
   });
-  if (openMoves.length === 0) {
+  const activeMoves = game.ecs.getComponentsByType<MoveComponent>("move");
+
+  if (openMoves.length === 0 && activeMoves.length === 0) {
     game.side = game.side === "player" ? "foe" : "player";
-    console.log("turn over");
     game.ecs.getComponentsByType<PlayerComponent>("player").forEach((c) => {
       c.moved = false;
     });

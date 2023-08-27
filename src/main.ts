@@ -64,7 +64,12 @@ function render() {
 
   let mouseX = (game.cursor.x / 16) | 0;
   let mouseY = (game.cursor.y / 16) | 0;
-  drawSprite2(renderer, mouseX * 16, mouseY * 16, 16 * 1 + 2);
+  if (game.side === "player") {
+    drawSprite2(renderer, mouseX * 16, mouseY * 16, 16 * 1 + 2);
+    canvas.style.cursor = "default";
+  } else {
+    canvas.style.cursor = "wait";
+  }
 
   if (game.activePlayer !== null) {
     const playerSprite = game.ecs.getComponent<SpriteComponent>(game.activePlayer, "sprite")!;

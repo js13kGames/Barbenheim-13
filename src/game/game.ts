@@ -32,6 +32,13 @@ export class Game {
       { type: "sprite", x: 2 * 16, y: 5 * 16, sprite: 16 * 3 },
     );
 
+    const player3 = ecs.createEntity();
+    ecs.addComponents(
+      player3,
+      { type: "player", moved: false },
+      { type: "sprite", x: 2 * 16, y: 10 * 16, sprite: 16 * 4 + 2 },
+    );
+
     const foe = ecs.createEntity();
     ecs.addComponents(
       foe,

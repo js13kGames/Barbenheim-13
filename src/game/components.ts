@@ -8,9 +8,13 @@ export interface SpriteComponent {
 export interface PlayerComponent {
   type: "player";
   moved: boolean;
+  movePoints: number;
+  hitPoints: number;
 }
 
 export interface FoeComponent {
   type: "foe";
   moved: boolean;
+  movePoints: number;
+  hitPoints: number;
 }

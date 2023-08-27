@@ -4,11 +4,11 @@ import { findPath } from "../engine/findPath.ts";
 
 export function enemySystem(game: Game) {
   if (game.side !== "foe") return;
+  if (game.ecs.getComponentsByType("move").length > 0) return;
 
   const foe = game.ecs.getComponentsByType<FoeComponent>("foe").find((c) => {
     return !c.moved;
   });
-  console.log("foe", foe);
   if (foe) {
     const players = game.ecs.getComponentsByType<PlayerComponent>("player");
     let closestPlayer = { entity: players[0].entity, distance: 1000 };
@@ -42,7 +42,6 @@ export function enemySystem(game: Game) {
       game.ecs.addComponent(foe.entity, { type: "move", path: movement, idx: 0 });
     }
   } else {
-    console.log("foe turn over");
     game.side = "player";
     game.ecs.getComponentsByType<PlayerComponent>("player").forEach((c) => {
       c.moved = false;
