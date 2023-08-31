@@ -29,7 +29,7 @@ export class Game {
     ecs.addComponents(
       player2,
       { type: "player", moved: false },
-      { type: "sprite", x: 2 * 16, y: 5 * 16, sprite: 16 * 3 },
+      { type: "sprite", x: 2 * 16, y: 5 * 16, sprite: 16 * 3 + 2 },
     );
 
     const player3 = ecs.createEntity();

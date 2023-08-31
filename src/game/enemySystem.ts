@@ -1,6 +1,7 @@
 import { Game } from "./game.ts";
 import { FoeComponent, PlayerComponent, SpriteComponent } from "./components.ts";
 import { findPath } from "../engine/findPath.ts";
+import { isFreeTile } from "./levelGenerator.ts";
 
 export function enemySystem(game: Game) {
   if (game.side !== "foe") return;
@@ -28,11 +29,9 @@ export function enemySystem(game: Game) {
 
     const path = findPath(
       (p) =>
-        p.x >= 0 &&
-        p.y >= 0 &&
-        p.x < 30 &&
-        p.y < 16 &&
-        game.tilemap?.getTile(p.x, p.y) === 16 * 1 + 7,
+        (p.x === ((foeSprite.x / 16) | 0) && p.y === ((foeSprite.y / 16) | 0)) ||
+        (p.x === ((playerSprite.x / 16) | 0) && p.y === ((playerSprite.y / 16) | 0)) ||
+        isFreeTile(game.ecs, game.tilemap!, p),
       { x: (foeSprite.x / 16) | 0, y: (foeSprite.y / 16) | 0 },
       { x: (playerSprite.x / 16) | 0, y: (playerSprite.y / 16) | 0 },
     );

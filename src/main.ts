@@ -4,9 +4,9 @@ import { SpriteRenderer } from "./engine/SpriteRenderer.ts";
 import { drawSprite2 } from "./engine/renderUtils.ts";
 import { TileMap } from "./engine/tilemap.ts";
 import { Game } from "./game/game.ts";
-import { generateLevel } from "./game/levelGenerator.ts";
+import { generateLevel, isFreeTile } from "./game/levelGenerator.ts";
 import { findPath } from "./engine/findPath.ts";
-import { SpriteComponent } from "./game/components.ts";
+import { FoeComponent, PlayerComponent, SpriteComponent } from "./game/components.ts";
 import { inputSystem } from "./game/inputSystem.ts";
 import { moveSystem } from "./game/moveSystem.ts";
 import { enemySystem } from "./game/enemySystem.ts";
@@ -59,6 +59,14 @@ function render() {
   }
 
   game.ecs.getComponentsByType<SpriteComponent>("sprite").forEach((sprite) => {
+    const playerComponent = game.ecs.getComponent<PlayerComponent>(sprite.entity, "player");
+    const foeComponent = game.ecs.getComponent<FoeComponent>(sprite.entity, "foe");
+    if (playerComponent && !playerComponent.moved && game.side === "player") {
+      drawSprite2(renderer, sprite.x, sprite.y, 19, 0.25 + Math.sin(t / 10) / 8);
+    }
+    if (foeComponent && !foeComponent.moved && game.side === "foe") {
+      drawSprite2(renderer, sprite.x, sprite.y, 19, 0.25 + Math.sin(t / 10) / 8);
+    }
     drawSprite2(renderer, sprite.x, sprite.y, sprite.sprite);
   });
 
@@ -76,10 +84,14 @@ function render() {
 
     const path = findPath(
       (p) =>
-        p.x >= 0 && p.y >= 0 && p.x < 30 && p.y < 16 && tilemap.getTile(p.x, p.y) === 16 * 1 + 7,
+        (p.x === mouseX && p.y === mouseY) ||
+        (p.x === playerSprite.x / 16 && p.y === playerSprite.y / 16) ||
+        isFreeTile(game.ecs, tilemap, p),
       { x: (playerSprite.x / 16) | 0, y: (playerSprite.y / 16) | 0 },
       { x: mouseX, y: mouseY },
     );
+    console.log(JSON.stringify(path, null, 2));
+
     path?.forEach((p, idx) => {
       drawSprite2(renderer, p.x * 16, p.y * 16, idx < 5 ? 16 * 2 + 3 : 16 * 2 + 5);
       if (idx === 4 || (idx === path.length - 1 && idx < 5)) {
@@ -96,6 +108,23 @@ function render() {
         const mix = 0.5 + (0.5 * Math.sin(t / 10)) / 4;
         const mid = { x: mix * prev.x + (1 - mix) * p.x, y: mix * prev.y + (1 - mix) * p.y };
         drawSprite2(renderer, mid.x * 16, mid.y * 16, 16 * 2 + 11);
+      }
+
+      if (idx === path.length - 1) {
+        const endTile = tilemap.getTile(p.x, p.y);
+        if (endTile === 16 * 3 + 4) {
+          const prev = path[idx - 1] ?? { x: playerSprite.x / 16, y: playerSprite.y / 16 };
+          const mix = 0.5 + (0.5 * Math.sin(t / 10)) / 4;
+          const mid = { x: mix * prev.x + (1 - mix) * p.x, y: mix * prev.y + (1 - mix) * p.y };
+          drawSprite2(renderer, mid.x * 16, mid.y * 16, 16 * 2 + 12);
+        }
+
+        const sprite = game.ecs.getComponentsByType<SpriteComponent>("sprite").find((sprite) => {
+          return ((sprite.x / 16) | 0) === (p.x | 0) && ((sprite.y / 16) | 0) === (p.y | 0);
+        });
+        if (sprite) {
+          drawSprite2(renderer, sprite.x, sprite.y, 16 * 2 + 13);
+        }
       }
     });
   }

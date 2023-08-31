@@ -1,6 +1,7 @@
 import { Cursor, Game } from "./game.ts";
 import { PlayerComponent, SpriteComponent } from "./components.ts";
 import { findPath } from "../engine/findPath.ts";
+import { isFreeTile } from "./levelGenerator.ts";
 
 export function inputSystem(game: Game) {
   if (game.side === "player") {
@@ -23,11 +24,8 @@ export function inputSystem(game: Game) {
             const sprite = game.ecs.getComponent<SpriteComponent>(game.activePlayer, "sprite")!;
             const path = findPath(
               (p) =>
-                p.x >= 0 &&
-                p.y >= 0 &&
-                p.x < 30 &&
-                p.y < 16 &&
-                game.tilemap?.getTile(p.x, p.y) === 16 * 1 + 7,
+                (p.x === sprite.x / 16 && p.y === sprite.y / 16) ||
+                isFreeTile(game.ecs, game.tilemap!, p),
               { x: (sprite.x / 16) | 0, y: (sprite.y / 16) | 0 },
               { x: (pos.x / 16) | 0, y: (pos.y / 16) | 0 },
             );
