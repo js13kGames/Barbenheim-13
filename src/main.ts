@@ -1,15 +1,15 @@
 import "./style.css";
 import { createCanvas, gameLoop, loadImage } from "./engine/gl-util.ts";
 import { SpriteRenderer } from "./engine/SpriteRenderer.ts";
-import { drawSprite2 } from "./engine/renderUtils.ts";
+import { drawSprite2, drawText } from "./engine/renderUtils.ts";
 import { TileMap } from "./engine/tilemap.ts";
 import { Game } from "./game/game.ts";
-import { generateLevel, isFreeTile } from "./game/levelGenerator.ts";
-import { findPath } from "./engine/findPath.ts";
+import { generateLevel } from "./game/levelGenerator.ts";
 import { FoeComponent, PlayerComponent, SpriteComponent } from "./game/components.ts";
 import { inputSystem } from "./game/inputSystem.ts";
 import { moveSystem } from "./game/moveSystem.ts";
 import { enemySystem } from "./game/enemySystem.ts";
+import { MoveCommand } from "./game/commands.ts";
 
 const pixelSize = 4;
 const canvas = createCanvas(1920, 1080);
@@ -28,7 +28,7 @@ canvas.addEventListener("mousemove", (e) => {
 });
 
 canvas.addEventListener("click", () => {
-  game.queue.push({ type: "click", pos: { ...game.cursor } });
+  game.eventQueue.push({ type: "click", pos: { ...game.cursor } });
 });
 
 const tilemap = new TileMap(30, 16);
@@ -60,74 +60,87 @@ function render() {
 
   game.ecs.getComponentsByType<SpriteComponent>("sprite").forEach((sprite) => {
     const playerComponent = game.ecs.getComponent<PlayerComponent>(sprite.entity, "player");
-    const foeComponent = game.ecs.getComponent<FoeComponent>(sprite.entity, "foe");
     if (playerComponent && !playerComponent.moved && game.side === "player") {
       drawSprite2(renderer, sprite.x, sprite.y, 19, 0.25 + Math.sin(t / 10) / 8);
     }
+
+    const foeComponent = game.ecs.getComponent<FoeComponent>(sprite.entity, "foe");
     if (foeComponent && !foeComponent.moved && game.side === "foe") {
       drawSprite2(renderer, sprite.x, sprite.y, 19, 0.25 + Math.sin(t / 10) / 8);
     }
+
     drawSprite2(renderer, sprite.x, sprite.y, sprite.sprite);
   });
 
-  let mouseX = (game.cursor.x / 16) | 0;
-  let mouseY = (game.cursor.y / 16) | 0;
   if (game.side === "player") {
+    let mouseX = (game.cursor.x / 16) | 0;
+    let mouseY = (game.cursor.y / 16) | 0;
     drawSprite2(renderer, mouseX * 16, mouseY * 16, 16 * 1 + 2);
-    canvas.style.cursor = "default";
-  } else {
-    canvas.style.cursor = "wait";
-  }
 
-  if (game.activePlayer !== null) {
-    const playerSprite = game.ecs.getComponent<SpriteComponent>(game.activePlayer, "sprite")!;
+    if (game.commandPreview.length > 0) {
+      game.commandPreview.forEach((command, cidx) => {
+        if (command.type === "move") {
+          command.path.forEach((p, idx) => {
+            drawSprite2(renderer, p.x * 16, p.y * 16, 16 * 2 + 3, idx > 4 ? 0.2 : 1);
+          });
+        }
+        const invalid =
+          cidx > 0 &&
+          game.commandPreview[cidx - 1].type === "move" &&
+          (game.commandPreview[cidx - 1] as MoveCommand).path.length > 5;
 
-    const path = findPath(
-      (p) =>
-        (p.x === mouseX && p.y === mouseY) ||
-        (p.x === playerSprite.x / 16 && p.y === playerSprite.y / 16) ||
-        isFreeTile(game.ecs, tilemap, p),
-      { x: (playerSprite.x / 16) | 0, y: (playerSprite.y / 16) | 0 },
-      { x: mouseX, y: mouseY },
-    );
-    console.log(JSON.stringify(path, null, 2));
-
-    path?.forEach((p, idx) => {
-      drawSprite2(renderer, p.x * 16, p.y * 16, idx < 5 ? 16 * 2 + 3 : 16 * 2 + 5);
-      if (idx === 4 || (idx === path.length - 1 && idx < 5)) {
-        drawSprite2(renderer, p.x * 16, p.y * 16, 16 * 2 + 6, 0.5 + Math.sin(t / 10) / 4);
-      }
-
-      const foe = game.ecs.getComponentsByType("foe").find((player) => {
-        const sprite = game.ecs.getComponent<SpriteComponent>(player.entity, "sprite")!;
-        return ((sprite.x / 16) | 0) === (p.x | 0) && ((sprite.y / 16) | 0) === (p.y | 0);
+        if (command.type === "mine") {
+          drawSprite2(
+            renderer,
+            command.pos.x * 16,
+            command.pos.y * 16,
+            16 * 2 + 12,
+            invalid ? 0.3 : 1,
+          );
+        }
+        if (command.type === "attack") {
+          drawSprite2(
+            renderer,
+            command.pos.x * 16,
+            command.pos.y * 16,
+            16 * 2 + 11,
+            invalid ? 0.3 : 1,
+          );
+        }
       });
-
-      if (foe) {
-        const prev = path[idx - 1] ?? { x: playerSprite.x / 16, y: playerSprite.y / 16 };
-        const mix = 0.5 + (0.5 * Math.sin(t / 10)) / 4;
-        const mid = { x: mix * prev.x + (1 - mix) * p.x, y: mix * prev.y + (1 - mix) * p.y };
-        drawSprite2(renderer, mid.x * 16, mid.y * 16, 16 * 2 + 11);
-      }
-
-      if (idx === path.length - 1) {
-        const endTile = tilemap.getTile(p.x, p.y);
-        if (endTile === 16 * 3 + 4) {
-          const prev = path[idx - 1] ?? { x: playerSprite.x / 16, y: playerSprite.y / 16 };
-          const mix = 0.5 + (0.5 * Math.sin(t / 10)) / 4;
-          const mid = { x: mix * prev.x + (1 - mix) * p.x, y: mix * prev.y + (1 - mix) * p.y };
-          drawSprite2(renderer, mid.x * 16, mid.y * 16, 16 * 2 + 12);
-        }
-
-        const sprite = game.ecs.getComponentsByType<SpriteComponent>("sprite").find((sprite) => {
-          return ((sprite.x / 16) | 0) === (p.x | 0) && ((sprite.y / 16) | 0) === (p.y | 0);
-        });
-        if (sprite) {
-          drawSprite2(renderer, sprite.x, sprite.y, 16 * 2 + 13);
-        }
-      }
-    });
+    }
   }
+
+  const currentCmd = game.commandQueue.at(0);
+  if (currentCmd) {
+    switch (currentCmd.type) {
+      case "attack": {
+        drawSprite2(
+          renderer,
+          currentCmd.pos.x * 16 + Math.random() * 4 - 2,
+          currentCmd.pos.y * 16 + Math.random() * 4 - 2,
+          16 * 2 + 14,
+        );
+        break;
+      }
+      case "mine": {
+        drawSprite2(
+          renderer,
+          currentCmd.pos.x * 16 + Math.random() * 4 - 2,
+          currentCmd.pos.y * 16 + Math.random() * 4 - 2 - (20 - currentCmd.ttl) / 2,
+          16 * 2 + 15,
+        );
+        break;
+      }
+    }
+  }
+
+  drawText(
+    renderer,
+    16,
+    16 * 16 + 2,
+    "Ore: " + game.inventory.ore + "    XP: " + game.inventory.xp,
+  );
 
   renderer.render();
 }

@@ -1,39 +1,40 @@
-import { Cursor, Game } from "./game.ts";
-import { PlayerComponent, SpriteComponent } from "./components.ts";
-
-export interface MoveComponent {
-  type: "move";
-  path: Cursor[];
-  idx: number;
-}
+import { Game } from "./game.ts";
+import { SpriteComponent } from "./components.ts";
 
 export function moveSystem(game: Game) {
-  game.ecs.getComponentsByType<MoveComponent>("move").forEach((move) => {
-    const sprite = game.ecs.getComponent<SpriteComponent>(move.entity, "sprite")!;
-    const path = move.path;
-    const next = path[move.idx];
-    sprite.x += Math.sign(next.x * 16 - sprite.x);
-    sprite.y += Math.sign(next.y * 16 - sprite.y);
-    if (sprite.x === next.x * 16 && sprite.y === next.y * 16) {
-      move.idx++;
-      if (move.idx >= path.length) {
-        game.ecs.removeComponent(move.entity, move);
+  if (game.commandQueue.length === 0) return;
+
+  const command = game.commandQueue.at(0)!;
+  switch (command.type) {
+    case "move": {
+      const sprite = game.ecs.getComponent<SpriteComponent>(command.entity, "sprite")!;
+      const path = command.path;
+      const next = path[command.idx];
+      sprite.x += Math.sign(next.x * 16 - sprite.x);
+      sprite.y += Math.sign(next.y * 16 - sprite.y);
+      if (sprite.x === next.x * 16 && sprite.y === next.y * 16) {
+        command.idx++;
+        if (command.idx >= path.length) {
+          game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
+        }
       }
+      break;
     }
-  });
-
-  const openMoves = game.ecs.getComponentsByType(game.side).filter((c) => {
-    return !(c as any as PlayerComponent).moved;
-  });
-  const activeMoves = game.ecs.getComponentsByType<MoveComponent>("move");
-
-  if (openMoves.length === 0 && activeMoves.length === 0) {
-    game.side = game.side === "player" ? "foe" : "player";
-    game.ecs.getComponentsByType<PlayerComponent>("player").forEach((c) => {
-      c.moved = false;
-    });
-    game.ecs.getComponentsByType<PlayerComponent>("foe").forEach((c) => {
-      c.moved = false;
-    });
+    case "mine": {
+      game.inventory.ore += (3 + Math.random() * 3) | 0;
+      if (command.ttl-- === 0) {
+        game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
+      }
+      break;
+    }
+    case "attack": {
+      if (game.side === "player") {
+        game.inventory.xp += (3 + Math.random() * 3) | 0;
+      }
+      if (command.ttl-- === 0) {
+        game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
+      }
+      break;
+    }
   }
 }

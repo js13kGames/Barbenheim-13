@@ -1,7 +1,8 @@
 import { Game } from "./game.ts";
 import { FoeComponent, PlayerComponent, SpriteComponent } from "./components.ts";
 import { findPath } from "../engine/findPath.ts";
-import { isFreeTile } from "./levelGenerator.ts";
+import { findSprite, isFreeTile } from "./levelGenerator.ts";
+import { getTilePos } from "./inputSystem.ts";
 
 export function enemySystem(game: Game) {
   if (game.side !== "foe") return;
@@ -11,6 +12,7 @@ export function enemySystem(game: Game) {
     return !c.moved;
   });
   if (foe) {
+    console.log("foe turn");
     const players = game.ecs.getComponentsByType<PlayerComponent>("player");
     let closestPlayer = { entity: players[0].entity, distance: 1000 };
     const foeSprite = game.ecs.getComponent<SpriteComponent>(foe.entity, "sprite")!;
@@ -26,21 +28,51 @@ export function enemySystem(game: Game) {
     });
 
     const playerSprite = game.ecs.getComponent<SpriteComponent>(closestPlayer.entity, "sprite")!;
+    const playerPos = getTilePos(playerSprite);
+    const foePos = getTilePos(foeSprite);
 
     const path = findPath(
       (p) =>
-        (p.x === ((foeSprite.x / 16) | 0) && p.y === ((foeSprite.y / 16) | 0)) ||
-        (p.x === ((playerSprite.x / 16) | 0) && p.y === ((playerSprite.y / 16) | 0)) ||
+        (p.x === foePos.x && p.y === foePos.y) ||
+        (p.x === playerPos.x && p.y === playerPos.y) ||
         isFreeTile(game.ecs, game.tilemap!, p),
-      { x: (foeSprite.x / 16) | 0, y: (foeSprite.y / 16) | 0 },
-      { x: (playerSprite.x / 16) | 0, y: (playerSprite.y / 16) | 0 },
+      foePos,
+      playerPos,
     );
-    if (path) {
-      const movement = path.length > 5 ? path.slice(0, 5) : path;
+    if (path && path.length > 0) {
+      let lastIndex = Math.min(path.length - 1, 4);
+      const lastPos = path[lastIndex];
+      const sprite = findSprite(game.ecs, lastPos.x, lastPos.y);
 
-      game.ecs.addComponent(foe.entity, { type: "move", path: movement, idx: 0 });
+      if (sprite) {
+        const targetfoe = game.ecs.getComponent<FoeComponent>(sprite.entity, "foe");
+        if (targetfoe) {
+          lastIndex--;
+        }
+
+        if (lastIndex > 0) {
+          game.commandQueue.push({
+            entity: foe.entity,
+            type: "move",
+            path: path.slice(0, lastIndex),
+            idx: 0,
+          });
+        }
+        const player = game.ecs.getComponent<PlayerComponent>(sprite.entity, "player");
+
+        if (player) {
+          game.commandQueue.push({ entity: foe.entity, type: "attack", pos: lastPos, ttl: 20 });
+        }
+      } else {
+        game.commandQueue.push({
+          entity: foe.entity,
+          type: "move",
+          path: path.slice(0, 5),
+          idx: 0,
+        });
+      }
     }
-  } else {
+  } else if (game.commandQueue.length === 0) {
     game.side = "player";
     game.ecs.getComponentsByType<PlayerComponent>("player").forEach((c) => {
       c.moved = false;

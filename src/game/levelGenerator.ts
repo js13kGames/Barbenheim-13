@@ -13,7 +13,7 @@ export function generateLevel(tilemap: TileMap) {
   for (let i = 0; i < 50; i++) {
     const x = (Math.random() * tilemap.width) | 0;
     const y = (Math.random() * tilemap.height) | 0;
-    let tile = (16 * 1 + 8 + Math.random() * 4) | 0;
+    let tile = (16 * 1 + 8 + Math.random() * 5) | 0;
     if (tile === 16 * 1 + 10) tile = 16 * 3 + 4;
     tilemap.setTile(x, y, tile);
   }

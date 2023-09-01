@@ -1,5 +1,7 @@
 import { Ecs, Entity } from "../engine/Ecs.ts";
 import { TileMap } from "../engine/tilemap.ts";
+import { Command } from "./commands.ts";
+import { Point } from "../engine/findPath.ts";
 
 export interface Cursor {
   x: number;
@@ -10,10 +12,17 @@ export class Game {
   t = 0;
   ecs = new Ecs();
   activePlayer: Entity | null = null;
-  cursor = { x: 0, y: 0 };
-  queue: any[] = [];
+  cursor: Point = { x: 0, y: 0 };
+  prevCursor: Point = { x: 0, y: 0 };
+  eventQueue: any[] = [];
   tilemap: TileMap | null = null;
   side: "player" | "foe" = "player";
+  commandPreview: Command[] = [];
+  commandQueue: Command[] = [];
+  inventory = {
+    xp: 0,
+    ore: 0,
+  };
 
   init() {
     const ecs = this.ecs;
