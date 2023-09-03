@@ -5,7 +5,12 @@ import { drawSprite2, drawText } from "./engine/renderUtils.ts";
 import { TileMap } from "./engine/tilemap.ts";
 import { Game } from "./game/game.ts";
 import { generateLevel } from "./game/levelGenerator.ts";
-import { FoeComponent, PlayerComponent, SpriteComponent } from "./game/components.ts";
+import {
+  FoeComponent,
+  PlayerComponent,
+  ShootComponent,
+  SpriteComponent,
+} from "./game/components.ts";
 import { inputSystem } from "./game/inputSystem.ts";
 import { moveSystem } from "./game/moveSystem.ts";
 import { enemySystem } from "./game/enemySystem.ts";
@@ -79,15 +84,18 @@ function render() {
 
     if (game.commandPreview.length > 0) {
       game.commandPreview.forEach((command, cidx) => {
+        const player = game.ecs.getComponent<PlayerComponent>(command.entity, "player")!;
+
         if (command.type === "move") {
           command.path.forEach((p, idx) => {
-            drawSprite2(renderer, p.x * 16, p.y * 16, 16 * 2 + 3, idx > 4 ? 0.2 : 1);
+            drawSprite2(renderer, p.x * 16, p.y * 16, 16 * 2 + 3, idx > player.speed - 1 ? 0.2 : 1);
           });
         }
+
         const invalid =
           cidx > 0 &&
           game.commandPreview[cidx - 1].type === "move" &&
-          (game.commandPreview[cidx - 1] as MoveCommand).path.length > 5;
+          (game.commandPreview[cidx - 1] as MoveCommand).path.length > player!.speed;
 
         if (command.type === "mine") {
           drawSprite2(
@@ -106,6 +114,17 @@ function render() {
             16 * 2 + 11,
             invalid ? 0.3 : 1,
           );
+        }
+        if (command.type === "shoot") {
+          drawSprite2(renderer, command.pos.x * 16, command.pos.y * 16, 16 * 1 + 6, 1);
+          const sprite = game.ecs.getComponent<SpriteComponent>(game.activePlayer!, "sprite")!;
+          const dx = (command.pos.x * 16 - sprite.x) / 10;
+          const dy = (command.pos.y * 16 - sprite.y) / 10;
+          for (let i = 0; i < 10; i++) {
+            const r = Math.PI / 10;
+            const h = Math.sin(i * r) * 2 * 16;
+            drawSprite2(renderer, sprite.x + dx * i, sprite.y + dy * i - h, 16 * 2 + 5, 1);
+          }
         }
       });
     }
@@ -132,6 +151,17 @@ function render() {
         );
         break;
       }
+      case "shoot": {
+        const i = currentCmd.idx;
+        const sprite = game.ecs.getComponent<SpriteComponent>(currentCmd.entity, "sprite")!;
+        const shooter = game.ecs.getComponent<ShootComponent>(currentCmd.entity, "shoot")!;
+        const dx = (currentCmd.pos.x * 16 - sprite.x) / 10;
+        const dy = (currentCmd.pos.y * 16 - sprite.y) / 10;
+        const r = Math.PI / 10;
+        const h = Math.sin(i * r) * 2 * 16;
+        const a = -Math.cos(i * r);
+        drawSprite2(renderer, sprite.x + dx * i, sprite.y + dy * i - h, shooter.bullet, 1, a);
+      }
     }
   }
 
@@ -141,6 +171,16 @@ function render() {
     16 * 16 + 2,
     "Ore: " + game.inventory.ore + "    XP: " + game.inventory.xp,
   );
+
+  drawSprite2(renderer, 16 * 10, 16 * 10, (16 * 7 + (Math.random() > 0.5 ? 0 : 16)) | 0);
+  drawSprite2(renderer, 16 * 10, 16 * 11, (16 * 7 + (Math.random() > 0.5 ? 0 : 16)) | 0);
+  drawSprite2(renderer, 16 * 10 - 8, 16 * 9, 16 * 6 + 0);
+  drawSprite2(renderer, 16 * 11 - 8, 16 * 9, 16 * 6 + 1);
+  for (let i = 0; i < 10; i++) {
+    const x = Math.random() * 16 - 8;
+    const y = Math.random() * 16 - 8;
+    drawSprite2(renderer, 16 * 10 + x * 2, 16 * 9 + y * 0.5, 16 * 8 + 1, 0.5);
+  }
 
   renderer.render();
 }

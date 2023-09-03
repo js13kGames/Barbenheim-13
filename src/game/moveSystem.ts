@@ -1,5 +1,5 @@
 import { Game } from "./game.ts";
-import { SpriteComponent } from "./components.ts";
+import { ShootComponent, SpriteComponent } from "./components.ts";
 
 export function moveSystem(game: Game) {
   if (game.commandQueue.length === 0) return;
@@ -33,6 +33,17 @@ export function moveSystem(game: Game) {
       }
       if (command.ttl-- === 0) {
         game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
+      }
+      break;
+    }
+    case "shoot": {
+      command.idx += 0.1;
+      if (command.idx >= 10) {
+        game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
+        const shootComponent = game.ecs.getComponent<ShootComponent>(command.entity, "shoot");
+        if (shootComponent?.bullet === 16 * 4 + 1) {
+          game.tilemap?.setTile(command.pos.x, command.pos.y, 16 * 4 + 5);
+        }
       }
       break;
     }

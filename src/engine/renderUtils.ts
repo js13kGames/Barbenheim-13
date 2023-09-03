@@ -76,8 +76,9 @@ export function drawSprite2(
   y: number,
   sprite: number,
   alpha = 1,
+  angle = 0,
 ) {
   const sy = (sprite / 16) | 0;
   const sx = sprite % 16;
-  renderer.drawSprite(x, y, sx * 16, sy * 16, 16, 16, alpha);
+  renderer.drawSprite(x, y, sx * 16, sy * 16, 16, 16, alpha, angle);
 }

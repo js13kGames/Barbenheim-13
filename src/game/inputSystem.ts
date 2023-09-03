@@ -1,5 +1,5 @@
 import { Cursor, Game } from "./game.ts";
-import { FoeComponent, PlayerComponent, SpriteComponent } from "./components.ts";
+import { FoeComponent, PlayerComponent, ShootComponent, SpriteComponent } from "./components.ts";
 import { findPath, Point } from "../engine/findPath.ts";
 import { findSprite } from "./levelGenerator.ts";
 
@@ -26,10 +26,14 @@ export function inputSystem(game: Game) {
         } else if (game.commandPreview.length > 0) {
           let chopRemaining = false;
           if (game.commandPreview[0].type === "move") {
-            if (game.commandPreview[0].path.length > 5) {
+            const player = game.ecs.getComponent<PlayerComponent>(
+              game.commandPreview[0].entity,
+              "player",
+            )!;
+            if (game.commandPreview[0].path.length > player!.speed) {
               chopRemaining = true;
             }
-            game.commandPreview[0].path = game.commandPreview[0].path.slice(0, 5);
+            game.commandPreview[0].path = game.commandPreview[0].path.slice(0, player!.speed);
           }
           if (chopRemaining) {
             game.commandQueue.push(game.commandPreview[0]);
@@ -98,10 +102,27 @@ export function inputSystem(game: Game) {
               ttl: 20,
             });
           }
-        } else {
+        } else if (lastTile === 16 * 1 + 7 && lastIndex > 0) {
           game.commandPreview = [
             { entity: game.activePlayer, type: "move", path: path.slice(0, lastIndex), idx: 0 },
           ];
+        }
+
+        const shootComponent = game.ecs.getComponent<ShootComponent>(game.activePlayer, "shoot");
+        if (shootComponent) {
+          const dx = lastPos.x - playerPos.x;
+          const dy = lastPos.y - playerPos.y;
+          const len = Math.sqrt(dx * dx + dy * dy);
+          console.log(len);
+          if (len > 5 && len < 10) {
+            game.commandPreview.pop();
+            game.commandPreview.push({
+              entity: game.activePlayer,
+              type: "shoot",
+              pos: lastPos,
+              idx: 0,
+            });
+          }
         }
       } else {
         game.commandPreview = [];

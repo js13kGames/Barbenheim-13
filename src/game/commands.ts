@@ -22,4 +22,11 @@ export interface AttackCommand {
   ttl: number;
 }
 
-export type Command = MoveCommand | MineCommand | AttackCommand;
+export interface ShootCommand {
+  entity: Entity;
+  type: "shoot";
+  pos: Point;
+  idx: number;
+}
+
+export type Command = MoveCommand | MineCommand | AttackCommand | ShootCommand;

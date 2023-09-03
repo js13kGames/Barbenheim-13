@@ -67,7 +67,7 @@ export function enemySystem(game: Game) {
         game.commandQueue.push({
           entity: foe.entity,
           type: "move",
-          path: path.slice(0, 5),
+          path: path.slice(0, foe!.speed),
           idx: 0,
         });
       }

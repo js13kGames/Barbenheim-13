@@ -10,6 +10,7 @@ export interface PlayerComponent {
   moved: boolean;
   movePoints: number;
   hitPoints: number;
+  speed: number;
 }
 
 export interface FoeComponent {
@@ -17,4 +18,10 @@ export interface FoeComponent {
   moved: boolean;
   movePoints: number;
   hitPoints: number;
+  speed: number;
+}
+
+export interface ShootComponent {
+  type: "shoot";
+  bullet: number;
 }
