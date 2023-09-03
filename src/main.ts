@@ -1,7 +1,7 @@
 import "./style.css";
 import { createCanvas, gameLoop, loadImage } from "./engine/gl-util.ts";
 import { SpriteRenderer } from "./engine/SpriteRenderer.ts";
-import { drawPanel, drawSprite2, drawText } from "./engine/renderUtils.ts";
+import { drawButton, drawPanel, drawSprite2, drawText } from "./engine/renderUtils.ts";
 import { TileMap } from "./engine/tilemap.ts";
 import { Game } from "./game/game.ts";
 import { findSprite, generateLevel } from "./game/levelGenerator.ts";
@@ -37,7 +37,7 @@ canvas.addEventListener("click", () => {
   game.eventQueue.push({ type: "click", pos: { ...game.cursor } });
 });
 
-const tilemap = new TileMap(30, 16);
+const tilemap = new TileMap(30, 17);
 generateLevel(tilemap);
 game.tilemap = tilemap;
 
@@ -53,8 +53,8 @@ function update() {
 function render() {
   const t = game.t;
 
-  for (let y = 0; y < 16; y++) {
-    for (let x = 0; x < 30; x++) {
+  for (let y = 0; y < 17; y++) {
+    for (let x = 6; x < 30; x++) {
       drawSprite2(renderer, x * 16, y * 16, tilemap.tiles[x + y * tilemap.width]);
     }
   }
@@ -171,26 +171,44 @@ function render() {
 
   const stats = game.ecs.getComponent<PlayerComponent>(game.activePlayer!, "player")!;
   if (stats) {
-    drawPanel(renderer, 0, 16, 10, 7);
-    drawText(renderer, 8, 24, stats.baseClass);
-    drawText(renderer, 8, 40, "HP: " + stats.health);
-    drawText(renderer, 8, 48, "AP: " + stats.strength);
-    drawText(renderer, 8, 56, "MP: " + stats.speed);
+    let y = 16;
+    drawPanel(renderer, 0, (y += 8), 12, 7);
+    drawText(renderer, 8, (y += 8), stats.baseClass);
+    drawText(renderer, 8, (y += 16), "HP: " + stats.health + "/" + stats.maxHealth);
+    drawText(renderer, 8, (y += 8), "AP: " + stats.strength);
+    drawText(renderer, 8, (y += 8), "MP: " + stats.speed);
   }
 
-  const hoveredfoeSprite = findSprite(game.ecs, game.cursor.x / 16, game.cursor.y / 16);
-  if (hoveredfoeSprite) {
-    const stats = game.ecs.getComponent<FoeComponent>(hoveredfoeSprite.entity, "foe")!;
-    if (stats) {
-      drawPanel(renderer, 0, 16 + 8 * 8, 10, 7);
-      drawText(renderer, 8, 24 + 8 * 8, stats.baseClass);
-      drawText(renderer, 8, 40 + 8 * 8, "HP: " + stats.health);
-      drawText(renderer, 8, 48 + 8 * 8, "AP: " + stats.strength);
-      drawText(renderer, 8, 56 + 8 * 8, "MP: " + stats.speed);
+  const hoveredSprite = findSprite(game.ecs, game.cursor.x / 16, game.cursor.y / 16);
+  if (hoveredSprite) {
+    const foeStats = game.ecs.getComponent<FoeComponent>(hoveredSprite.entity, "foe")!;
+    if (foeStats) {
+      let y = 16 + 8 * 7;
+      drawPanel(renderer, 0, (y += 8), 12, 7);
+      drawText(renderer, 8, (y += 8), foeStats.baseClass);
+      drawText(renderer, 8, (y += 16), "HP: " + foeStats.health + "/" + foeStats.maxHealth);
+      drawText(renderer, 8, (y += 8), "AP: " + foeStats.strength);
+      drawText(renderer, 8, (y += 8), "MP: " + foeStats.speed);
+    } else if (game.activePlayer === null) {
+      const playerStats = game.ecs.getComponent<PlayerComponent>(hoveredSprite.entity, "player")!;
+      if (playerStats) {
+        let y = 16;
+        drawPanel(renderer, 0, (y += 8), 12, 7);
+        drawText(renderer, 8, (y += 8), playerStats.baseClass);
+        drawText(renderer, 8, (y += 16), "HP: " + playerStats.health + "/" + playerStats.maxHealth);
+        drawText(renderer, 8, (y += 8), "AP: " + playerStats.strength);
+        drawText(renderer, 8, (y += 8), "MP: " + playerStats.speed);
+      }
     }
   }
 
-  drawText(renderer, 16, 16 * 16 + 2, "Ore: " + game.inventory.ore);
+  drawPanel(renderer, 0, 0, 12, 3);
+  drawText(renderer, 8, 8, game.side + " turn");
+
+  if (game.side === "player") {
+    drawButton(renderer, 0, 15 * 16 + 8, 12, "End turn", true);
+  }
+  // drawText(renderer, 16, 16 * 16 + 2, "Ore: " + game.inventory.ore);
 
   renderer.render();
 }

@@ -6,6 +6,7 @@ export function drawTextbox(
   y: number,
   w: number,
   text: string,
+  centered = false,
 ) {
   let lines = [];
   let currentWidth = 0;
@@ -29,14 +30,57 @@ export function drawTextbox(
   }
   drawPanel(renderer, x, y, w, lines.length + 2);
   lines.forEach((line, i) => {
-    drawText(renderer, x + 8, y + 8 + i * 8, line);
+    const leftPad = centered ? 7 + (maxWidth - line.length * 7) / 2 : 8;
+    drawText(renderer, x + leftPad, y + 8 + i * 8, line);
   });
 }
 
-export function drawPanel(renderer: SpriteRenderer, x: number, y: number, w: number, h: number) {
+export function drawButton(
+  renderer: SpriteRenderer,
+  x: number,
+  y: number,
+  w: number,
+  text: string,
+  centered = false,
+) {
+  let lines = [];
+  let currentWidth = 0;
+  const maxWidth = w * 8 - 16;
+  let currentLine: string[] = [];
+  const words = text.split(" ");
+  words.forEach((word, i) => {
+    if (currentWidth + word.length * 7 > maxWidth) {
+      lines.push(currentLine.join(" "));
+      currentWidth = 0;
+      currentLine = [];
+    }
+    currentLine.push(word);
+    currentWidth += word.length * 7;
+    if (i < words.length - 1) {
+      currentWidth += 7;
+    }
+  });
+  if (currentLine.length > 0) {
+    lines.push(currentLine.join(" "));
+  }
+  drawPanel(renderer, x, y, w, lines.length + 2, 32 * 21 + 1);
+  lines.forEach((line, i) => {
+    const leftPad = centered ? 7 + (maxWidth - line.length * 7) / 2 : 8;
+    drawText(renderer, x + leftPad, y + 8 + i * 8, line);
+  });
+}
+
+export function drawPanel(
+  renderer: SpriteRenderer,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  base = 32 * 3 + 1,
+) {
   for (let dy = 0; dy < h; dy++) {
     for (let dx = 0; dx < w; dx++) {
-      let sprite = 32 * 3 + 1;
+      let sprite = base;
       if (dy === 0) sprite -= 32;
       if (dy === h - 1) sprite += 32;
       if (dx === 0) sprite -= 1;

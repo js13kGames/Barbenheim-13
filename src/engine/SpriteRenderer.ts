@@ -233,7 +233,7 @@ export class SpriteRenderer {
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.dataview, 0);
         gl.drawArrays(gl.TRIANGLES, 0, 6 * (batchSize + 1));
         offset = -4;
-        painted += batchSize;
+        painted += batchSize + 1;
       }
     });
 
@@ -242,6 +242,7 @@ export class SpriteRenderer {
       gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.dataview, 0);
       gl.drawArrays(gl.TRIANGLES, 0, 6 * remaining);
     }
+
     this.queue.length = 0;
   }
 }

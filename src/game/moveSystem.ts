@@ -1,5 +1,7 @@
 import { Game } from "./game.ts";
-import { ShootComponent, SpriteComponent } from "./components.ts";
+import { FoeComponent, PlayerComponent, ShootComponent, SpriteComponent } from "./components.ts";
+import { findSprite } from "./levelGenerator.ts";
+import { spriteNames } from "./sprites.ts";
 
 export function moveSystem(game: Game) {
   if (game.commandQueue.length === 0) return;
@@ -21,14 +23,36 @@ export function moveSystem(game: Game) {
       break;
     }
     case "mine": {
-      game.inventory.ore += (3 + Math.random() * 3) | 0;
       if (command.ttl-- === 0) {
+        game.inventory.ore += (3 + Math.random() * 3) | 0;
         game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
       }
       break;
     }
     case "attack": {
       if (command.ttl-- === 0) {
+        const targetSprite = findSprite(game.ecs, command.pos.x, command.pos.y);
+        const targetFoe =
+          targetSprite && game.ecs.getComponent<FoeComponent>(targetSprite.entity, "foe");
+        const targetPlayer =
+          targetSprite && game.ecs.getComponent<PlayerComponent>(targetSprite.entity, "player");
+        const actor =
+          game.ecs.getComponent<PlayerComponent>(command.entity, "player") ??
+          game.ecs.getComponent<FoeComponent>(command.entity, "foe");
+        const target = targetFoe ?? targetPlayer;
+        if (actor && target) {
+          target.health -= actor.strength;
+          if (target.health <= 0) {
+            game.ecs.removeEntity(targetSprite!.entity);
+            const skull = game.ecs.createEntity();
+            game.ecs.addComponents(skull, {
+              type: "sprite",
+              x: targetSprite!.x,
+              y: targetSprite!.y,
+              sprite: spriteNames.skull,
+            });
+          }
+        }
         game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
       }
       break;

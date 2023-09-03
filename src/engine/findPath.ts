@@ -66,6 +66,6 @@ export function findPath(
   return path.reverse();
 }
 
-function hDist(a: Point, b: Point) {
+export function hDist(a: Point, b: Point) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }

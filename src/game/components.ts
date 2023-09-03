@@ -22,6 +22,7 @@ export interface ShootComponent {
 
 export interface Stats {
   baseClass: BaseClass;
+  maxHealth: number;
   health: number;
   strength: number;
   speed: number;

@@ -8,6 +8,8 @@ export const spriteNames = {
   dragon1: 16 * 8 + 5,
   dragon2: 16 * 8 + 6,
 
+  skull: 16 * 5 + 2,
+
   arrow: 16 * 4,
   bomb: 16 * 4 + 1,
 };
