@@ -23,6 +23,7 @@ export class Game {
   inventory = {
     ore: 0,
   };
+  state: "playing" | "win" | "lose" = "playing";
 
   init() {
     const ecs = this.ecs;

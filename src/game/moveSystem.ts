@@ -51,6 +51,18 @@ export function moveSystem(game: Game) {
               y: targetSprite!.y,
               sprite: spriteNames.skull,
             });
+
+            if (game.side === "player") {
+              const foeCount = game.ecs.getComponentsByType<FoeComponent>("foe").length;
+              if (foeCount === 0) {
+                game.state = "win";
+              }
+            } else {
+              const playerCount = game.ecs.getComponentsByType<PlayerComponent>("player").length;
+              if (playerCount === 0) {
+                game.state = "lose";
+              }
+            }
           }
         }
         game.commandQueue.splice(game.commandQueue.indexOf(command), 1);

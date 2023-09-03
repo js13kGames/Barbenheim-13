@@ -1,7 +1,7 @@
 import "./style.css";
 import { createCanvas, gameLoop, loadImage } from "./engine/gl-util.ts";
 import { SpriteRenderer } from "./engine/SpriteRenderer.ts";
-import { drawButton, drawPanel, drawSprite2, drawText } from "./engine/renderUtils.ts";
+import { drawPanel, drawSprite2, drawText, drawTextbox } from "./engine/renderUtils.ts";
 import { TileMap } from "./engine/tilemap.ts";
 import { Game } from "./game/game.ts";
 import { findSprite, generateLevel } from "./game/levelGenerator.ts";
@@ -205,29 +205,13 @@ function render() {
   drawPanel(renderer, 0, 0, 12, 3);
   drawText(renderer, 8, 8, game.side + " turn");
 
-  if (game.side === "player") {
-    drawButton(renderer, 0, 15 * 16 + 8, 12, "End turn", true);
+  if (game.state === "win") {
+    drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You win!", true);
+  } else if (game.state === "lose") {
+    drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You lose!", true);
   }
-  // drawText(renderer, 16, 16 * 16 + 2, "Ore: " + game.inventory.ore);
 
   renderer.render();
 }
 
 gameLoop(update, render);
-
-/*
-  - swordsman
-  - archer
-  - dwarf
-  - trebuchet
-  - skeleton
-  - king
-  - peasant
-  - knight
-  - dragon
-  - wizard
-  - priest
-  - goblin
-  - princess
-  - orc
- */
