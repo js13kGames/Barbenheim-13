@@ -28,9 +28,6 @@ export function moveSystem(game: Game) {
       break;
     }
     case "attack": {
-      if (game.side === "player") {
-        game.inventory.xp += (3 + Math.random() * 3) | 0;
-      }
       if (command.ttl-- === 0) {
         game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
       }

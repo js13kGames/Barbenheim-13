@@ -1,10 +1,10 @@
 import "./style.css";
 import { createCanvas, gameLoop, loadImage } from "./engine/gl-util.ts";
 import { SpriteRenderer } from "./engine/SpriteRenderer.ts";
-import { drawSprite2, drawText } from "./engine/renderUtils.ts";
+import { drawPanel, drawSprite2, drawText } from "./engine/renderUtils.ts";
 import { TileMap } from "./engine/tilemap.ts";
 import { Game } from "./game/game.ts";
-import { generateLevel } from "./game/levelGenerator.ts";
+import { findSprite, generateLevel } from "./game/levelGenerator.ts";
 import {
   FoeComponent,
   PlayerComponent,
@@ -165,24 +165,47 @@ function render() {
     }
   }
 
-  drawText(
-    renderer,
-    16,
-    16 * 16 + 2,
-    "Ore: " + game.inventory.ore + "    XP: " + game.inventory.xp,
-  );
-
-  drawSprite2(renderer, 16 * 10, 16 * 10, (16 * 7 + (Math.random() > 0.5 ? 0 : 16)) | 0);
-  drawSprite2(renderer, 16 * 10, 16 * 11, (16 * 7 + (Math.random() > 0.5 ? 0 : 16)) | 0);
-  drawSprite2(renderer, 16 * 10 - 8, 16 * 9, 16 * 6 + 0);
-  drawSprite2(renderer, 16 * 11 - 8, 16 * 9, 16 * 6 + 1);
-  for (let i = 0; i < 10; i++) {
-    const x = Math.random() * 16 - 8;
-    const y = Math.random() * 16 - 8;
-    drawSprite2(renderer, 16 * 10 + x * 2, 16 * 9 + y * 0.5, 16 * 8 + 1, 0.5);
+  const stats = game.ecs.getComponent<PlayerComponent>(game.activePlayer!, "player")!;
+  if (stats) {
+    drawPanel(renderer, 0, 16, 10, 7);
+    drawText(renderer, 8, 24, stats.baseClass);
+    drawText(renderer, 8, 40, "HP: " + stats.health);
+    drawText(renderer, 8, 48, "AP: " + stats.strength);
+    drawText(renderer, 8, 56, "MP: " + stats.speed);
   }
+
+  const hoveredfoeSprite = findSprite(game.ecs, game.cursor.x / 16, game.cursor.y / 16);
+  if (hoveredfoeSprite) {
+    const stats = game.ecs.getComponent<FoeComponent>(hoveredfoeSprite.entity, "foe")!;
+    if (stats) {
+      drawPanel(renderer, 0, 16 + 8 * 8, 10, 7);
+      drawText(renderer, 8, 24 + 8 * 8, stats.baseClass);
+      drawText(renderer, 8, 40 + 8 * 8, "HP: " + stats.health);
+      drawText(renderer, 8, 48 + 8 * 8, "AP: " + stats.strength);
+      drawText(renderer, 8, 56 + 8 * 8, "MP: " + stats.speed);
+    }
+  }
+
+  drawText(renderer, 16, 16 * 16 + 2, "Ore: " + game.inventory.ore);
 
   renderer.render();
 }
 
 gameLoop(update, render);
+
+/*
+  - swordsman
+  - archer
+  - dwarf
+  - trebuchet
+  - skeleton
+  - king
+  - peasant
+  - knight
+  - dragon
+  - wizard
+  - priest
+  - goblin
+  - princess
+  - orc
+ */

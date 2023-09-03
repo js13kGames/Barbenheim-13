@@ -2,6 +2,7 @@ import { Ecs, Entity } from "../engine/Ecs.ts";
 import { TileMap } from "../engine/tilemap.ts";
 import { Command } from "./commands.ts";
 import { Point } from "../engine/findPath.ts";
+import { spriteNames } from "./sprites.ts";
 
 export interface Cursor {
   x: number;
@@ -20,7 +21,6 @@ export class Game {
   commandPreview: Command[] = [];
   commandQueue: Command[] = [];
   inventory = {
-    xp: 0,
     ore: 0,
   };
 
@@ -30,45 +30,45 @@ export class Game {
     const player = ecs.createEntity();
     ecs.addComponents(
       player,
-      { type: "player", moved: false, speed: 5 },
-      { type: "sprite", x: 3 * 16, y: 3 * 16, sprite: 16 * 3 },
+      { type: "player", moved: false, baseClass: "swordsman", health: 10, strength: 7, speed: 5 },
+      { type: "sprite", x: 8 * 16, y: 3 * 16, sprite: spriteNames.swordsman },
     );
 
     const player2 = ecs.createEntity();
     ecs.addComponents(
       player2,
-      { type: "player", moved: false, speed: 5 },
-      { type: "sprite", x: 2 * 16, y: 5 * 16, sprite: 16 * 3 + 2 },
+      { type: "player", moved: false, baseClass: "dwarf", health: 10, strength: 5, speed: 5 },
+      { type: "sprite", x: 8 * 16, y: 5 * 16, sprite: spriteNames.dwarf },
     );
 
     const player3 = ecs.createEntity();
     ecs.addComponents(
       player3,
-      { type: "player", moved: false, speed: 5 },
-      { type: "sprite", x: 2 * 16, y: 10 * 16, sprite: 16 * 4 + 2 },
-      { type: "shoot", bullet: 16 * 4 + 0 },
+      { type: "player", moved: false, baseClass: "archer", health: 10, strength: 3, speed: 5 },
+      { type: "sprite", x: 8 * 16, y: 10 * 16, sprite: spriteNames.archer },
+      { type: "shoot", bullet: spriteNames.arrow },
     );
 
     const player4 = ecs.createEntity();
     ecs.addComponents(
       player4,
-      { type: "player", moved: false, speed: 3 },
-      { type: "sprite", x: 2 * 16, y: 8 * 16, sprite: 16 * 4 + 3 },
-      { type: "shoot", bullet: 16 * 4 + 1 },
+      { type: "player", moved: false, baseClass: "trebuchet", health: 10, strength: 99, speed: 3 },
+      { type: "sprite", x: 8 * 16, y: 8 * 16, sprite: spriteNames.trebuchet },
+      { type: "shoot", bullet: spriteNames.bomb },
     );
 
     const foe = ecs.createEntity();
     ecs.addComponents(
       foe,
-      { type: "foe", moved: false, speed: 5 },
-      { type: "sprite", x: 20 * 16, y: 10 * 16, sprite: 16 * 5 + 1 },
+      { type: "foe", moved: false, baseClass: "orc", health: 10, strength: 1, speed: 5 },
+      { type: "sprite", x: 20 * 16, y: 10 * 16, sprite: spriteNames.orc },
     );
 
     const foe2 = ecs.createEntity();
     ecs.addComponents(
       foe2,
-      { type: "foe", moved: false, speed: 5 },
-      { type: "sprite", x: 21 * 16, y: 12 * 16, sprite: 16 * 5 + 1 },
+      { type: "foe", moved: false, baseClass: "orc", health: 10, strength: 1, speed: 5 },
+      { type: "sprite", x: 21 * 16, y: 12 * 16, sprite: spriteNames.orc },
     );
   }
 }

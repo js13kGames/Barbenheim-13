@@ -5,23 +5,33 @@ export interface SpriteComponent {
   sprite: number;
 }
 
-export interface PlayerComponent {
+export interface PlayerComponent extends Stats {
   type: "player";
   moved: boolean;
-  movePoints: number;
-  hitPoints: number;
-  speed: number;
 }
 
-export interface FoeComponent {
+export interface FoeComponent extends Stats {
   type: "foe";
   moved: boolean;
-  movePoints: number;
-  hitPoints: number;
-  speed: number;
 }
 
 export interface ShootComponent {
   type: "shoot";
   bullet: number;
 }
+
+export interface Stats {
+  baseClass: BaseClass;
+  health: number;
+  strength: number;
+  speed: number;
+}
+
+export type BaseClass =
+  | "swordsman"
+  | "archer"
+  | "dwarf"
+  | "trebuchet"
+  | "orc"
+  | "dragon"
+  | "princess";

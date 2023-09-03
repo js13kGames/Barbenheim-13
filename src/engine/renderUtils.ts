@@ -36,9 +36,9 @@ export function drawTextbox(
 export function drawPanel(renderer: SpriteRenderer, x: number, y: number, w: number, h: number) {
   for (let dy = 0; dy < h; dy++) {
     for (let dx = 0; dx < w; dx++) {
-      let sprite = 64 + 17;
-      if (dy === 0) sprite -= 16;
-      if (dy === h - 1) sprite += 16;
+      let sprite = 32 * 3 + 1;
+      if (dy === 0) sprite -= 32;
+      if (dy === h - 1) sprite += 32;
       if (dx === 0) sprite -= 1;
       if (dx === w - 1) sprite += 1;
       drawSprite(renderer, x + dx * 8, y + dy * 8, sprite);
@@ -65,8 +65,8 @@ export function drawText(renderer: SpriteRenderer, x: number, y: number, text: s
 }
 
 export function drawSprite(renderer: SpriteRenderer, x: number, y: number, sprite: number) {
-  const sy = (sprite / 16) | 0;
-  const sx = sprite % 16;
+  const sy = (sprite / 32) | 0;
+  const sx = sprite % 32;
   renderer.drawSprite(x, y, sx * 8, sy * 8, 8, 8);
 }
 
