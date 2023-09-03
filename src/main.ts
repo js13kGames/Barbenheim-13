@@ -15,6 +15,7 @@ import { inputSystem } from "./game/inputSystem.ts";
 import { moveSystem } from "./game/moveSystem.ts";
 import { enemySystem } from "./game/enemySystem.ts";
 import { MoveCommand } from "./game/commands.ts";
+import { spriteNames } from "./game/sprites.ts";
 
 const pixelSize = 4;
 const canvas = createCanvas(1920, 1080);
@@ -75,6 +76,9 @@ function render() {
     }
 
     drawSprite2(renderer, sprite.x, sprite.y, sprite.sprite);
+    if (sprite.sprite === spriteNames.dragon1) {
+      drawSprite2(renderer, sprite.x + 16, sprite.y, spriteNames.dragon2);
+    }
   });
 
   if (game.side === "player") {
