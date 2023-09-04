@@ -211,6 +211,40 @@ function render() {
     drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You lose!", true);
   }
 
+  //--- begin nuke
+  const t2 = (0.7 * t) % 32;
+  const alpha = (32 - t2) / 32;
+  if (t2 > 16) {
+    drawSprite2(renderer, 16 * 10, 16 * 7, 16 * 7 + (Math.random() > 0.5 ? 16 : 0), alpha);
+  }
+  drawSprite2(renderer, 16 * 10, 16 * 8, 16 * 7 + (Math.random() > 0.5 ? 16 : 0), alpha);
+
+  drawSprite2(renderer, 16 * 10 - 8, 16 * 8 - t2, 16 * 6, alpha, 0, 2 - alpha);
+  drawSprite2(renderer, 16 * 11 - 8, 16 * 8 - t2, 16 * 6 + 1, alpha, 0, 2 - alpha);
+
+  drawSprite2(renderer, 16 * 10 - 8, 16 * 8 - t2, 16 * 8 + 2, alpha * 0.7, -t2 / 5, 3 - alpha);
+  drawSprite2(
+    renderer,
+    16 * 11 - 8 + t2 * 0.15,
+    16 * 8 - t2,
+    16 * 8 + 2,
+    alpha * 0.7,
+    t2 / 5,
+    3 - alpha,
+  );
+
+  for (let i = 0; i < 10; i++) {
+    drawSprite2(
+      renderer,
+      16 * 10 + Math.random() * 24 - 12,
+      16 * 8 + 8,
+      16 * 6 + 4 + (Math.random() < 0.25 ? 0 : 1),
+      alpha,
+      Math.sin(t),
+    );
+  }
+  //--- end nuke
+
   renderer.render();
 }
 
