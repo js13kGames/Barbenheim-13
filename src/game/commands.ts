@@ -20,6 +20,7 @@ export interface AttackCommand {
   type: "attack";
   pos: Point;
   ttl: number;
+  ranged: boolean;
 }
 
 export interface ShootCommand {

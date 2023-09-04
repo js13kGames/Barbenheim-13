@@ -20,6 +20,17 @@ export interface ShootComponent {
   bullet: number;
 }
 
+export interface RangedComponent {
+  type: "ranged";
+  range: number;
+  action: "attack" | "heal";
+}
+
+export interface ActionComponent {
+  type: "action";
+  actions: ("mine" | "attack")[];
+}
+
 export interface Stats {
   baseClass: BaseClass;
   maxHealth: number;

@@ -12,7 +12,7 @@ export interface Cursor {
 export class Game {
   t = 0;
   ecs = new Ecs();
-  activePlayer: Entity | null = null;
+  selectedEntity: Entity | null = null;
   cursor: Point = { x: 0, y: 0 };
   prevCursor: Point = { x: 0, y: 0 };
   eventQueue: any[] = [];
@@ -41,6 +41,7 @@ export class Game {
         speed: 5,
       },
       { type: "sprite", x: 8 * 16, y: 3 * 16, sprite: spriteNames.swordsman },
+      { type: "action", actions: ["attack"] },
     );
 
     const player2 = ecs.createEntity();
@@ -56,6 +57,7 @@ export class Game {
         speed: 5,
       },
       { type: "sprite", x: 8 * 16, y: 5 * 16, sprite: spriteNames.dwarf },
+      { type: "action", actions: ["mine", "attack"] },
     );
 
     const player3 = ecs.createEntity();
@@ -72,6 +74,7 @@ export class Game {
       },
       { type: "sprite", x: 6 * 16, y: 4 * 16, sprite: spriteNames.archer },
       { type: "shoot", bullet: spriteNames.arrow },
+      { type: "ranged", range: 10, action: "attack" },
     );
 
     const player4 = ecs.createEntity();
@@ -88,6 +91,7 @@ export class Game {
       },
       { type: "sprite", x: 6 * 16, y: 6 * 16, sprite: spriteNames.trebuchet },
       { type: "shoot", bullet: spriteNames.bomb },
+      { type: "ranged", range: 10, action: "attack" },
     );
 
     const foe = ecs.createEntity();

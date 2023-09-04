@@ -1,4 +1,14 @@
 export const spriteNames = {
+  cursor: 16 * 1 + 2,
+  idle: 16 * 1 + 4,
+  selected: 16 * 2 + 6,
+  greenDot: 16 * 2 + 3,
+
+  mine: 16 * 2 + 12,
+  attack: 16 * 2 + 11,
+
+  mountain: 16 * 3 + 4,
+
   swordsman: 16 * 3,
   archer: 16 * 4 + 2,
   dwarf: 16 * 3 + 2,

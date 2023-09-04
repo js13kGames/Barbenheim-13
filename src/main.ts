@@ -11,11 +11,11 @@ import {
   ShootComponent,
   SpriteComponent,
 } from "./game/components.ts";
-import { inputSystem } from "./game/inputSystem.ts";
+import { getTilePos, inputSystem } from "./game/inputSystem.ts";
 import { moveSystem } from "./game/moveSystem.ts";
 import { enemySystem } from "./game/enemySystem.ts";
-import { MoveCommand } from "./game/commands.ts";
 import { spriteNames } from "./game/sprites.ts";
+import { AttackCommand, MineCommand, ShootCommand } from "./game/commands.ts";
 
 const pixelSize = 4;
 const canvas = createCanvas(1920, 1080);
@@ -59,8 +59,87 @@ function render() {
     }
   }
 
-  if (game.activePlayer !== null) {
-    const sprite = game.ecs.getComponent<SpriteComponent>(game.activePlayer, "sprite")!;
+  game.ecs.getComponentsByType<SpriteComponent>("sprite").forEach((sprite) => {
+    const playerComponent = game.ecs.getComponent<PlayerComponent>(sprite.entity, "player");
+    if (playerComponent && !playerComponent.moved && game.side === "player") {
+      drawSprite2(renderer, sprite.x, sprite.y, spriteNames.idle, 0.25 + Math.sin(t / 10) / 8);
+    }
+
+    const foeComponent = game.ecs.getComponent<FoeComponent>(sprite.entity, "foe");
+    if (foeComponent && !foeComponent.moved && game.side === "foe") {
+      drawSprite2(renderer, sprite.x, sprite.y, spriteNames.idle, 0.25 + Math.sin(t / 10) / 8);
+    }
+
+    drawSprite2(renderer, sprite.x, sprite.y, sprite.sprite);
+    if (sprite.sprite === spriteNames.dragon1) {
+      drawSprite2(renderer, sprite.x + 16, sprite.y, spriteNames.dragon2);
+    }
+  });
+
+  if (game.selectedEntity !== null) {
+    const sprite = game.ecs.getComponent<SpriteComponent>(game.selectedEntity, "sprite")!;
+    drawSprite2(renderer, sprite.x, sprite.y, spriteNames.selected, 0.5 + Math.sin(t / 10) / 4);
+
+    // @ts-ignore
+    game.commandPreview.forEach((command, cidx) => {
+      switch (command.type) {
+        case "move": {
+          // @ts-ignore
+          command.path.forEach((p, idx) => {
+            drawSprite2(renderer, p.x * 16, p.y * 16, spriteNames.greenDot, 1);
+          });
+          break;
+        }
+        case "mine": {
+          const mineCommand = command as MineCommand;
+          drawSprite2(
+            renderer,
+            mineCommand.pos.x * 16,
+            mineCommand.pos.y * 16,
+            spriteNames.mine,
+            1,
+          );
+          break;
+        }
+        case "attack": {
+          const attackCommand = command as AttackCommand;
+          drawSprite2(
+            renderer,
+            attackCommand.pos.x * 16,
+            attackCommand.pos.y * 16,
+            spriteNames.attack,
+            1,
+          );
+          break;
+        }
+        case "shoot": {
+          const attackCommand = command as ShootCommand;
+          drawSprite2(
+            renderer,
+            attackCommand.pos.x * 16,
+            attackCommand.pos.y * 16,
+            spriteNames.attack,
+            1,
+          );
+          const dx = (command.pos.x * 16 - sprite.x) / 10;
+          const dy = (command.pos.y * 16 - sprite.y) / 10;
+          for (let i = 0; i < 10; i++) {
+            const r = Math.PI / 10;
+            const h = Math.sin(i * r) * 2 * 16;
+            drawSprite2(renderer, sprite.x + dx * i, sprite.y + dy * i - h, 16 * 2 + 5, 1);
+          }
+          break;
+        }
+      }
+    });
+  }
+
+  const cursor = getTilePos(game.cursor);
+  drawSprite2(renderer, cursor.x * 16, cursor.y * 16, spriteNames.cursor, 1);
+
+  /*
+  if (game.selectedEntity !== null) {
+    const sprite = game.ecs.getComponent<SpriteComponent>(game.selectedEntity, "sprite")!;
     drawSprite2(renderer, sprite.x, sprite.y, 16 * 2 + 6, 0.5 + Math.sin(t / 10) / 4);
   }
 
@@ -121,7 +200,7 @@ function render() {
         }
         if (command.type === "shoot") {
           drawSprite2(renderer, command.pos.x * 16, command.pos.y * 16, 16 * 1 + 6, 1);
-          const sprite = game.ecs.getComponent<SpriteComponent>(game.activePlayer!, "sprite")!;
+          const sprite = game.ecs.getComponent<SpriteComponent>(game.selectedEntity!, "sprite")!;
           const dx = (command.pos.x * 16 - sprite.x) / 10;
           const dy = (command.pos.y * 16 - sprite.y) / 10;
           for (let i = 0; i < 10; i++) {
@@ -133,6 +212,7 @@ function render() {
       });
     }
   }
+*/
 
   const currentCmd = game.commandQueue.at(0);
   if (currentCmd) {
@@ -169,7 +249,7 @@ function render() {
     }
   }
 
-  const stats = game.ecs.getComponent<PlayerComponent>(game.activePlayer!, "player")!;
+  const stats = game.ecs.getComponent<PlayerComponent>(game.selectedEntity!, "player")!;
   if (stats) {
     let y = 16;
     drawPanel(renderer, 0, (y += 8), 12, 7);
@@ -189,7 +269,7 @@ function render() {
       drawText(renderer, 8, (y += 16), "HP: " + foeStats.health + "/" + foeStats.maxHealth);
       drawText(renderer, 8, (y += 8), "AP: " + foeStats.strength);
       drawText(renderer, 8, (y += 8), "MP: " + foeStats.speed);
-    } else if (game.activePlayer === null) {
+    } else if (game.selectedEntity === null) {
       const playerStats = game.ecs.getComponent<PlayerComponent>(hoveredSprite.entity, "player")!;
       if (playerStats) {
         let y = 16;
@@ -210,7 +290,7 @@ function render() {
   } else if (game.state === "lose") {
     drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You lose!", true);
   }
-
+  /*
   //--- begin nuke
   const t2 = (0.7 * t) % 32;
   const alpha = (32 - t2) / 32;
@@ -244,7 +324,7 @@ function render() {
     );
   }
   //--- end nuke
-
+*/
   renderer.render();
 }
 
