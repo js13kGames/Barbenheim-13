@@ -24,6 +24,7 @@ export class Game {
     ore: 0,
   };
   state: "playing" | "win" | "lose" = "playing";
+  nuke: { x: number; y: number; tStart: number } | null = null;
 
   init() {
     const ecs = this.ecs;

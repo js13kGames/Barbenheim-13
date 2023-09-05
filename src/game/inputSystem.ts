@@ -21,7 +21,7 @@ export function inputSystem(game: Game) {
         const pos: Cursor = event.pos;
         const sprite = findSprite(game.ecs, (pos.x / 16) | 0, (pos.y / 16) | 0);
         const player = sprite && game.ecs.getComponent<PlayerComponent>(sprite.entity, "player");
-        if (sprite && player) {
+        if (sprite && player && !player.moved) {
           game.selectedEntity = sprite.entity;
         } else {
           if (game.commandPreview.length > 0 && game.selectedEntity !== null) {

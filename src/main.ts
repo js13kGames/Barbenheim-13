@@ -126,7 +126,7 @@ function render() {
           for (let i = 0; i < 10; i++) {
             const r = Math.PI / 10;
             const h = Math.sin(i * r) * 2 * 16;
-            drawSprite2(renderer, sprite.x + dx * i, sprite.y + dy * i - h, 16 * 2 + 5, 1);
+            drawSprite2(renderer, sprite.x + dx * i, sprite.y + dy * i - h, spriteNames.redDot, 1);
           }
           break;
         }
@@ -222,7 +222,7 @@ function render() {
           renderer,
           currentCmd.pos.x * 16 + Math.random() * 4 - 2,
           currentCmd.pos.y * 16 + Math.random() * 4 - 2,
-          16 * 2 + 14,
+          spriteNames.blood,
         );
         break;
       }
@@ -231,7 +231,7 @@ function render() {
           renderer,
           currentCmd.pos.x * 16 + Math.random() * 4 - 2,
           currentCmd.pos.y * 16 + Math.random() * 4 - 2 - (20 - currentCmd.ttl) / 2,
-          16 * 2 + 15,
+          spriteNames.ore,
         );
         break;
       }
@@ -290,41 +290,47 @@ function render() {
   } else if (game.state === "lose") {
     drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You lose!", true);
   }
-  /*
-  //--- begin nuke
-  const t2 = (0.7 * t) % 32;
-  const alpha = (32 - t2) / 32;
-  if (t2 > 16) {
-    drawSprite2(renderer, 16 * 10, 16 * 7, 16 * 7 + (Math.random() > 0.5 ? 16 : 0), alpha);
-  }
-  drawSprite2(renderer, 16 * 10, 16 * 8, 16 * 7 + (Math.random() > 0.5 ? 16 : 0), alpha);
 
-  drawSprite2(renderer, 16 * 10 - 8, 16 * 8 - t2, 16 * 6, alpha, 0, 2 - alpha);
-  drawSprite2(renderer, 16 * 11 - 8, 16 * 8 - t2, 16 * 6 + 1, alpha, 0, 2 - alpha);
+  if (game.nuke) {
+    const { x, y, tStart } = game.nuke;
 
-  drawSprite2(renderer, 16 * 10 - 8, 16 * 8 - t2, 16 * 8 + 2, alpha * 0.7, -t2 / 5, 3 - alpha);
-  drawSprite2(
-    renderer,
-    16 * 11 - 8 + t2 * 0.15,
-    16 * 8 - t2,
-    16 * 8 + 2,
-    alpha * 0.7,
-    t2 / 5,
-    3 - alpha,
-  );
+    //--- begin nuke
+    const t2 = (0.7 * (t - tStart)) % 32;
+    const alpha = (32 - t2) / 32;
+    if (t2 > 16) {
+      drawSprite2(renderer, 16 * x, 16 * (y - 1), 16 * 7 + (Math.random() > 0.5 ? 16 : 0), alpha);
+    }
+    drawSprite2(renderer, 16 * x, 16 * y, 16 * 7 + (Math.random() > 0.5 ? 16 : 0), alpha);
 
-  for (let i = 0; i < 10; i++) {
+    drawSprite2(renderer, 16 * x - 8, 16 * y - t2, 16 * 6, alpha, 0, 2 - alpha);
+    drawSprite2(renderer, 16 * (x + 1) - 8, 16 * y - t2, 16 * 6 + 1, alpha, 0, 2 - alpha);
+
+    drawSprite2(renderer, 16 * x - 8, 16 * y - t2, 16 * 8 + 2, alpha * 0.7, -t2 / 5, 3 - alpha);
     drawSprite2(
       renderer,
-      16 * 10 + Math.random() * 24 - 12,
-      16 * 8 + 8,
-      16 * 6 + 4 + (Math.random() < 0.25 ? 0 : 1),
-      alpha,
-      Math.sin(t),
+      16 * (x + 1) - 8 + t2 * 0.15,
+      16 * y - t2,
+      16 * 8 + 2,
+      alpha * 0.7,
+      t2 / 5,
+      3 - alpha,
     );
+
+    for (let i = 0; i < 10; i++) {
+      drawSprite2(
+        renderer,
+        16 * x + Math.random() * 24 - 12,
+        16 * y + 8,
+        16 * 6 + 4 + (Math.random() < 0.25 ? 0 : 1),
+        alpha,
+        Math.sin(t),
+      );
+    }
+    if (t2 >= 31) {
+      game.nuke = null;
+    }
   }
   //--- end nuke
-*/
   renderer.render();
 }
 
