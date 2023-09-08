@@ -1,3 +1,5 @@
+import { ViteImageOptimizer } from "vite-plugin-image-optimizer";
+
 export default {
   build: {
     target: "esnext",
@@ -5,4 +7,5 @@ export default {
       polyfill: false,
     },
   },
+  plugins: [ViteImageOptimizer()],
 };

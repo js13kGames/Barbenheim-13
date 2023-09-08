@@ -61,7 +61,13 @@ export function enemySystem(game: Game) {
         const player = game.ecs.getComponent<PlayerComponent>(sprite.entity, "player");
 
         if (player) {
-          game.commandQueue.push({ entity: foe.entity, type: "attack", pos: lastPos, ttl: 20 });
+          game.commandQueue.push({
+            entity: foe.entity,
+            type: "attack",
+            pos: lastPos,
+            ttl: 20,
+            ranged: false,
+          });
         }
       } else {
         game.commandQueue.push({

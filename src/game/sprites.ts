@@ -5,6 +5,10 @@ export const spriteNames = {
   greenDot: 16 * 2 + 3,
   redDot: 16 * 2 + 5,
 
+  grass: 16 * 1 + 7,
+  road: 16 * 1 + 8,
+  water: 16 * 1 + 9,
+
   mine: 16 * 2 + 12,
   attack: 16 * 2 + 11,
 
