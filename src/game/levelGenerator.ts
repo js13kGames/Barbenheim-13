@@ -51,25 +51,26 @@ function createTerrain(tilemap: TileMap, _rnd: Random) {
   }
 }
 
-export function generateLevel(tilemap: TileMap) {
+export function generateLevel(tilemap: TileMap, objmap: TileMap) {
   const rnd = new Random(2);
   fillMap(tilemap, spriteNames.grass);
+  fillMap(objmap, -1);
   createTerrain(tilemap, rnd);
 
   for (let i = 0; i < 30; i++) {
     const x = rnd.inext(tilemap.width);
     const y = rnd.inext(tilemap.height);
     if (i % 2 === 0) {
-      tilemap.setTile(x | 0, y | 0, spriteNames.mountain);
+      objmap.setTile(x | 0, y | 0, spriteNames.mountain);
     } else {
-      tilemap.setTile(x | 0, y | 0, spriteNames.tree);
+      objmap.setTile(x | 0, y | 0, spriteNames.tree);
     }
   }
 
   for (let i = 0; i < 7; i++) {
     const x = rnd.inext(tilemap.width);
     const y = rnd.inext(tilemap.height);
-    tilemap.setTile(x | 0, y | 0, spriteNames.tower);
+    objmap.setTile(x | 0, y | 0, spriteNames.castle);
   }
 
   createRiver(tilemap, rnd);

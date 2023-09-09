@@ -15,7 +15,13 @@ export function getTilePos(pixelPos: Point) {
 }
 
 export function inputSystem(game: Game) {
-  if (game.side === "player") {
+  if (game.messageBox) {
+    game.eventQueue.forEach((event) => {
+      if (event.type === "click") {
+        game.messageBox = null;
+      }
+    });
+  } else if (game.side === "player") {
     game.eventQueue.forEach((event) => {
       if (event.type === "click") {
         const pos: Cursor = event.pos;

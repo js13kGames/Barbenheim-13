@@ -1,7 +1,13 @@
 import "./style.css";
 import { createCanvas, gameLoop, loadImage } from "./engine/gl-util.ts";
 import { SpriteRenderer } from "./engine/SpriteRenderer.ts";
-import { drawPanel, drawSprite2, drawText, drawTextbox } from "./engine/renderUtils.ts";
+import {
+  drawPanel,
+  drawSprite2,
+  drawSprite3,
+  drawText,
+  drawTextbox,
+} from "./engine/renderUtils.ts";
 import { TileMap } from "./engine/tilemap.ts";
 import { Game } from "./game/game.ts";
 import { findSprite, generateLevel } from "./game/levelGenerator.ts";
@@ -16,6 +22,7 @@ import { moveSystem } from "./game/moveSystem.ts";
 import { enemySystem } from "./game/enemySystem.ts";
 import { spriteNames } from "./game/sprites.ts";
 import { AttackCommand, MineCommand, ShootCommand } from "./game/commands.ts";
+import { story } from "./game/story.ts";
 
 const pixelSize = 4;
 const canvas = createCanvas(1920, 1080);
@@ -38,20 +45,19 @@ canvas.addEventListener("click", () => {
 });
 
 const tilemap = new TileMap(30, 17);
-generateLevel(tilemap);
+const objmqp = new TileMap(30, 17);
+generateLevel(tilemap, objmqp);
 game.tilemap = tilemap;
+game.objmap = objmqp;
 
 game.init();
+game.messageBox = story[0];
 
 function update() {
   game.tick++;
   inputSystem(game);
   enemySystem(game);
   moveSystem(game);
-
-  if (game.turn >= 0) {
-    game.messageBox = story[game.turn++];
-  }
 }
 
 function render() {
@@ -60,6 +66,7 @@ function render() {
   for (let y = 0; y < 17; y++) {
     for (let x = 6; x < 30; x++) {
       drawSprite2(renderer, x * 16, y * 16, tilemap.tiles[x + y * tilemap.width]);
+      drawSprite3(renderer, x * 16, y * 16, objmqp.tiles[x + y * tilemap.width]);
     }
   }
 
@@ -273,17 +280,13 @@ function render() {
     drawTextbox(renderer, 16 * 8, 16 * 8, 40, game.messageBox);
   }
 
+  drawSprite3(renderer, 16 * 8, 16 * 4, spriteNames.castle);
+  drawSprite3(renderer, 16 * 9, 16 * 4, spriteNames.castle + 1);
+  drawSprite3(renderer, 16 * 8, 16 * 5, spriteNames.castle + 2);
+  drawSprite3(renderer, 16 * 8, 16 * 6, spriteNames.castle);
+
   //--- end nuke
   renderer.render();
 }
 
 gameLoop(update, render);
-
-const story = [
-  "In the 13th century, a tragedy fell upon the kingdom of Barbenheim. Their beloved princess suddenly dissapeared. Rumors say that she was kidnapped by a dragon and taken to his lair in the mountains.",
-  "Our alchemist needs you to bring him som rare ore from the mines. You will recognize it by its green glow. He will use it to craft a powerful weapon that will help you defeat the dragon.",
-  "A goat farmer has lost a good deal of his heard. He suspects that the dragon has been feeding on his goats. He will reward you if you bring him back some goat meat.",
-  "The dragon has been terrorizing the kingdom for too long. It is time to put an end to this. Find the princess and bring her back to the castle.",
-  "The weapon is ready. It is time to face the dragon.",
-  "Much to our surprise, the princess refuses to return to the castle. She fled to the mountains to get some rest from the constant courtship from the princes of the neighboring kingdoms. She is not in any danger and will return to the castle when she is ready.",
-];

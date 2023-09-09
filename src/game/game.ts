@@ -18,6 +18,7 @@ export class Game {
   prevCursor: Point = { x: 0, y: 0 };
   eventQueue: any[] = [];
   tilemap: TileMap | null = null;
+  objmap: TileMap | null = null;
   side: "player" | "foe" = "player";
   commandPreview: Command[] = [];
   commandQueue: Command[] = [];

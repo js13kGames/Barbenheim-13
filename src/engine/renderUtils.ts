@@ -127,3 +127,18 @@ export function drawSprite2(
   const sx = sprite % 16;
   renderer.drawSprite(x, y, sx * 16, sy * 16, 16, 16, alpha, angle, scale, 0);
 }
+
+export function drawSprite3(
+  renderer: SpriteRenderer,
+  x: number,
+  y: number,
+  sprite: number,
+  alpha = 1,
+  angle = 0,
+  scale = 1,
+) {
+  if (sprite < 0) return;
+  const sy = (sprite / 16) | 0;
+  const sx = sprite % 16;
+  renderer.drawSprite(x, y - 8, sx * 16, sy * 16, 16, 24, alpha, angle, scale, 0);
+}

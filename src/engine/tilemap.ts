@@ -1,5 +1,6 @@
 export class TileMap {
   tiles: number[];
+
   constructor(
     public width: number,
     public height: number,
