@@ -1,6 +1,7 @@
 import { ViteImageOptimizer } from "vite-plugin-image-optimizer";
+import { defineConfig } from "vite";
 
-export default {
+export default defineConfig({
   build: {
     target: "esnext",
     modulePreload: {
@@ -8,4 +9,4 @@ export default {
     },
   },
   plugins: [ViteImageOptimizer()],
-};
+});
