@@ -81,7 +81,7 @@ export function moveSystem(game: Game) {
         const shootComponent = game.ecs.getComponent<ShootComponent>(command.entity, "shoot");
         if (shootComponent?.bullet === 16 * 4 + 1) {
           game.tilemap?.setTile(command.pos.x, command.pos.y, 16 * 4 + 5);
-          game.nuke = { x: command.pos.x, y: command.pos.y, tStart: game.t };
+          game.nuke = { x: command.pos.x, y: command.pos.y, tStart: game.tick };
         }
       }
       break;

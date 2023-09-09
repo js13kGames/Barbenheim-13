@@ -44,14 +44,18 @@ game.tilemap = tilemap;
 game.init();
 
 function update() {
-  game.t++;
+  game.tick++;
   inputSystem(game);
   enemySystem(game);
   moveSystem(game);
+
+  if (game.turn >= 0) {
+    game.messageBox = story[game.turn++];
+  }
 }
 
 function render() {
-  const t = game.t;
+  const t = game.tick;
 
   for (let y = 0; y < 17; y++) {
     for (let x = 6; x < 30; x++) {
@@ -167,7 +171,18 @@ function render() {
         const r = Math.PI / 10;
         const h = Math.sin(i * r) * 2 * 16;
         const a = -Math.cos(i * r);
-        drawSprite2(renderer, sprite.x + dx * i, sprite.y + dy * i - h, shooter.bullet, 1, a);
+        if (shooter.bullet === spriteNames.fireball) {
+          drawSprite2(
+            renderer,
+            sprite.x + dx * i,
+            sprite.y + dy * i,
+            shooter.bullet,
+            1,
+            game.tick / 6,
+          );
+        } else {
+          drawSprite2(renderer, sprite.x + dx * i, sprite.y + dy * i - h, shooter.bullet, 1, a);
+        }
       }
     }
   }
@@ -253,8 +268,22 @@ function render() {
       game.nuke = null;
     }
   }
+
+  if (game.messageBox) {
+    drawTextbox(renderer, 16 * 8, 16 * 8, 40, game.messageBox);
+  }
+
   //--- end nuke
   renderer.render();
 }
 
 gameLoop(update, render);
+
+const story = [
+  "In the 13th century, a tragedy fell upon the kingdom of Barbenheim. Their beloved princess suddenly dissapeared. Rumors say that she was kidnapped by a dragon and taken to his lair in the mountains.",
+  "Our alchemist needs you to bring him som rare ore from the mines. You will recognize it by its green glow. He will use it to craft a powerful weapon that will help you defeat the dragon.",
+  "A goat farmer has lost a good deal of his heard. He suspects that the dragon has been feeding on his goats. He will reward you if you bring him back some goat meat.",
+  "The dragon has been terrorizing the kingdom for too long. It is time to put an end to this. Find the princess and bring her back to the castle.",
+  "The weapon is ready. It is time to face the dragon.",
+  "Much to our surprise, the princess refuses to return to the castle. She fled to the mountains to get some rest from the constant courtship from the princes of the neighboring kingdoms. She is not in any danger and will return to the castle when she is ready.",
+];

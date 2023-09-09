@@ -90,7 +90,7 @@ export function drawPanel(
   }
 }
 
-export function drawText(renderer: SpriteRenderer, x: number, y: number, text: string) {
+export function drawText(renderer: SpriteRenderer, x: number, y: number, text: string, alpha = 1) {
   let count = 0;
   for (let i = 0; i < text.length; i++) {
     const char = text.toUpperCase().charCodeAt(i);
@@ -103,7 +103,7 @@ export function drawText(renderer: SpriteRenderer, x: number, y: number, text: s
     }
     const sy = (sprite / 32) | 0;
     const sx = sprite % 32;
-    renderer.drawSprite(x + count * 7, y, sx * 8, sy * 8, 8, 8);
+    renderer.drawSprite(x + count * 7, y, sx * 8, sy * 8, 8, 8, alpha);
     count++;
   }
 }

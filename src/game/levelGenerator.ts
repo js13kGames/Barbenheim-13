@@ -35,9 +35,18 @@ function createRiver(tilemap: TileMap, rnd: Random) {
 function createBridge(tilemap: TileMap, rnd: Random) {
   let y = 0.25 * tilemap.height + rnd.inext() * tilemap.height * 0.5;
   for (let x = 0; x < tilemap.width; x++) {
-    tilemap.setTile(x, y | 0, spriteNames.grass);
+    tilemap.setTile(x, y | 0, spriteNames.road);
     if (rnd.next() > 0.75) {
       y += rnd.next() < 0.5 ? -1 : 1;
+    }
+  }
+}
+
+function createTerrain(tilemap: TileMap, _rnd: Random) {
+  for (let y = 0; y < tilemap.height; y++) {
+    for (let x = 0; x < tilemap.width; x++) {
+      const tile = 16 + 7;
+      tilemap.setTile(x, y, tile | 0);
     }
   }
 }
@@ -45,19 +54,32 @@ function createBridge(tilemap: TileMap, rnd: Random) {
 export function generateLevel(tilemap: TileMap) {
   const rnd = new Random(2);
   fillMap(tilemap, spriteNames.grass);
+  createTerrain(tilemap, rnd);
+
+  for (let i = 0; i < 30; i++) {
+    const x = rnd.inext(tilemap.width);
+    const y = rnd.inext(tilemap.height);
+    if (i % 2 === 0) {
+      tilemap.setTile(x | 0, y | 0, spriteNames.mountain);
+    } else {
+      tilemap.setTile(x | 0, y | 0, spriteNames.tree);
+    }
+  }
+
+  for (let i = 0; i < 7; i++) {
+    const x = rnd.inext(tilemap.width);
+    const y = rnd.inext(tilemap.height);
+    tilemap.setTile(x | 0, y | 0, spriteNames.tower);
+  }
+
   createRiver(tilemap, rnd);
   createBridge(tilemap, rnd);
 }
 
 export function isFreeTile(ecs: Ecs, tilemap: TileMap, p: Point) {
-  return (
-    p.x >= 0 &&
-    p.y >= 0 &&
-    p.x < 30 &&
-    p.y < 16 &&
-    tilemap.getTile(p.x, p.y) === 16 * 1 + 7 &&
-    !findSprite(ecs, p.x, p.y)
-  );
+  if (p.x < 0 && p.y >= 0 && p.x < 30 && p.y < 16) return false;
+  const tile = tilemap.getTile(p.x, p.y);
+  return (tile === 16 * 1 + 7 || tile === 16 * 1 + 8) && !findSprite(ecs, p.x, p.y);
 }
 
 export function findSprite(ecs: Ecs, x: number, y: number) {

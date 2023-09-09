@@ -1,6 +1,12 @@
 import { Game } from "./game.ts";
-import { FoeComponent, PlayerComponent, SpriteComponent } from "./components.ts";
-import { findPath } from "../engine/findPath.ts";
+import {
+  FoeComponent,
+  PlayerComponent,
+  RangedComponent,
+  ShootComponent,
+  SpriteComponent,
+} from "./components.ts";
+import { findPath, hDist } from "../engine/findPath.ts";
 import { findSprite, isFreeTile } from "./levelGenerator.ts";
 import { getTilePos } from "./inputSystem.ts";
 
@@ -76,6 +82,19 @@ export function enemySystem(game: Game) {
           path: path.slice(0, foe!.speed),
           idx: 0,
         });
+
+        const shooter = game.ecs.getComponent<ShootComponent>(foe.entity, "shoot")!;
+        const ranged = game.ecs.getComponent<RangedComponent>(foe.entity, "ranged")!;
+        if (shooter && ranged && ranged.action === "attack") {
+          if (hDist(playerPos, foePos) <= ranged.range) {
+            game.commandQueue.push({
+              entity: foe.entity,
+              type: "shoot",
+              pos: playerPos,
+              idx: 0,
+            });
+          }
+        }
       }
     }
   } else if (game.commandQueue.length === 0) {

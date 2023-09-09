@@ -10,7 +10,8 @@ export interface Cursor {
 }
 
 export class Game {
-  t = 0;
+  tick = 0;
+  turn = 0;
   ecs = new Ecs();
   selectedEntity: Entity | null = null;
   cursor: Point = { x: 0, y: 0 };
@@ -25,6 +26,7 @@ export class Game {
   };
   state: "playing" | "win" | "lose" = "playing";
   nuke: { x: number; y: number; tStart: number } | null = null;
+  messageBox: string | null = null;
 
   init() {
     const ecs = this.ecs;
@@ -95,6 +97,21 @@ export class Game {
       { type: "ranged", range: 10, action: "attack" },
     );
 
+    const player5 = ecs.createEntity();
+    ecs.addComponents(
+      player5,
+      {
+        type: "player",
+        moved: false,
+        baseClass: "king",
+        health: 7,
+        maxHealth: 7,
+        strength: 99,
+        speed: 3,
+      },
+      { type: "sprite", x: 6 * 16, y: 2 * 16, sprite: spriteNames.king },
+    );
+
     const foe = ecs.createEntity();
     ecs.addComponents(
       foe,
@@ -125,6 +142,21 @@ export class Game {
       { type: "sprite", x: 21 * 16, y: 12 * 16, sprite: spriteNames.orc },
     );
 
+    const foe3 = ecs.createEntity();
+    ecs.addComponents(
+      foe3,
+      {
+        type: "foe",
+        moved: false,
+        baseClass: "princess",
+        health: 10,
+        maxHealth: 10,
+        strength: 1,
+        speed: 5,
+      },
+      { type: "sprite", x: 23 * 16, y: 11 * 16, sprite: spriteNames.princess },
+    );
+
     const dragon = ecs.createEntity();
     ecs.addComponents(
       dragon,
@@ -138,6 +170,8 @@ export class Game {
         speed: 3,
       },
       { type: "sprite", x: 23 * 16, y: 9 * 16, sprite: spriteNames.dragon1 },
+      { type: "shoot", bullet: spriteNames.fireball },
+      { type: "ranged", range: 10, action: "attack" },
     );
   }
 }

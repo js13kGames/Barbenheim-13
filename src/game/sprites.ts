@@ -16,10 +16,14 @@ export const spriteNames = {
   ore: 16 * 2 + 15,
 
   mountain: 16 * 3 + 4,
+  tree: 16 * 1 + 12,
+  tower: 16 * 9 + 3,
 
   swordsman: 16 * 3,
   archer: 16 * 4 + 2,
-  dwarf: 16 * 3 + 2,
+  dwarf: 16 * 3 + 1,
+  princess: 16 * 3 + 2,
+  king: 16 * 3 + 3,
   trebuchet: 16 * 4 + 3,
 
   orc: 16 * 5 + 1,
@@ -30,4 +34,5 @@ export const spriteNames = {
 
   arrow: 16 * 4,
   bomb: 16 * 4 + 1,
+  fireball: 16 * 8 + 1,
 };
