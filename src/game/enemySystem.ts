@@ -11,14 +11,13 @@ import { findSprite, isFreeTile } from "./levelGenerator.ts";
 import { getTilePos } from "./inputSystem.ts";
 
 export function enemySystem(game: Game) {
-  if (game.side !== "foe") return;
+  if (game.side !== "foe" || game.commandQueue.length > 0) return;
   if (game.ecs.getComponentsByType("move").length > 0) return;
 
   const foe = game.ecs.getComponentsByType<FoeComponent>("foe").find((c) => {
     return !c.moved;
   });
   if (foe) {
-    console.log("foe turn");
     const players = game.ecs.getComponentsByType<PlayerComponent>("player");
     let closestPlayer = { entity: players[0].entity, distance: 1000 };
     const foeSprite = game.ecs.getComponent<SpriteComponent>(foe.entity, "sprite")!;
@@ -41,15 +40,14 @@ export function enemySystem(game: Game) {
       (p) =>
         (p.x === foePos.x && p.y === foePos.y) ||
         (p.x === playerPos.x && p.y === playerPos.y) ||
-        isFreeTile(game.ecs, game.tilemap!, p),
+        isFreeTile(game.ecs, game.tilemap!, game.objmap!, p),
       foePos,
       playerPos,
     );
     if (path && path.length > 0) {
-      let lastIndex = Math.min(path.length - 1, 4);
+      let lastIndex = Math.min(path.length - 1, foe.speed);
       const lastPos = path[lastIndex];
       const sprite = findSprite(game.ecs, lastPos.x, lastPos.y);
-
       if (sprite) {
         const targetfoe = game.ecs.getComponent<FoeComponent>(sprite.entity, "foe");
         if (targetfoe) {

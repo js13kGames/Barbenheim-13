@@ -20,6 +20,7 @@ export const spriteNames = {
   tree: 16 * 3 + 7,
   tower: 16 * 9 + 3,
   castle: 16 * 9 + 7,
+  checkers: 16 * 9 + 1,
 
   swordsman: 16 * 3,
   archer: 16 * 4 + 2,

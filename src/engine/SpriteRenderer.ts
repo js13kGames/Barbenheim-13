@@ -13,6 +13,8 @@ interface DrawCmd {
   angle: number;
   scale: number;
   flash: number;
+  layer: number;
+  idx: number;
 }
 
 export class SpriteRenderer {
@@ -24,6 +26,7 @@ export class SpriteRenderer {
   constructor(
     private canvas: HTMLCanvasElement,
     private pixelSize = 4,
+    public layer = 0,
   ) {
     this.gl = this.canvas.getContext("webgl2")!;
     const gl = this.gl;
@@ -134,8 +137,8 @@ export class SpriteRenderer {
     cy = dstY + height / 2,
   ) {
     this.queue.push({
-      x: dstX,
-      y: dstY,
+      x: dstX | 0,
+      y: dstY | 0,
       u: srcX,
       v: srcY,
       w: width,
@@ -146,6 +149,18 @@ export class SpriteRenderer {
       flash,
       cx,
       cy,
+      layer: this.layer,
+      idx: this.queue.length,
+    });
+  }
+
+  sort() {
+    this.queue.sort((a, b) => {
+      const layerDiff = a.layer - b.layer;
+      if (layerDiff !== 0) return layerDiff;
+      const yDiff = a.y + a.h - (b.y + b.h);
+      if (yDiff !== 0) return yDiff;
+      return a.idx - b.idx;
     });
   }
 
@@ -244,6 +259,7 @@ export class SpriteRenderer {
     }
 
     this.queue.length = 0;
+    this.layer = 0;
   }
 }
 

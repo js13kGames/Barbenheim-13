@@ -44,7 +44,7 @@ export class Game {
         strength: 7,
         speed: 5,
       },
-      { type: "sprite", x: 8 * 16, y: 3 * 16, sprite: spriteNames.swordsman },
+      { type: "sprite", x: 9 * 16, y: 3 * 16, sprite: spriteNames.swordsman },
       { type: "action", actions: ["attack"] },
     );
 
@@ -60,7 +60,7 @@ export class Game {
         strength: 5,
         speed: 5,
       },
-      { type: "sprite", x: 8 * 16, y: 5 * 16, sprite: spriteNames.dwarf },
+      { type: "sprite", x: 9 * 16, y: 5 * 16, sprite: spriteNames.dwarf },
       { type: "action", actions: ["mine", "attack"] },
     );
 
@@ -125,7 +125,7 @@ export class Game {
         strength: 1,
         speed: 5,
       },
-      { type: "sprite", x: 20 * 16, y: 10 * 16, sprite: spriteNames.orc },
+      { type: "sprite", x: 21 * 16, y: 10 * 16, sprite: spriteNames.orc },
     );
 
     const foe2 = ecs.createEntity();
@@ -140,7 +140,7 @@ export class Game {
         strength: 1,
         speed: 5,
       },
-      { type: "sprite", x: 21 * 16, y: 12 * 16, sprite: spriteNames.orc },
+      { type: "sprite", x: 22 * 16, y: 12 * 16, sprite: spriteNames.orc },
     );
 
     const foe3 = ecs.createEntity();

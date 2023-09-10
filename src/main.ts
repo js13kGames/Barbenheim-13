@@ -63,9 +63,16 @@ function update() {
 function render() {
   const t = game.tick;
 
+  renderer.layer = 0;
   for (let y = 0; y < 17; y++) {
     for (let x = 6; x < 30; x++) {
       drawSprite2(renderer, x * 16, y * 16, tilemap.tiles[x + y * tilemap.width]);
+    }
+  }
+
+  renderer.layer = 1;
+  for (let y = 0; y < 17; y++) {
+    for (let x = 6; x < 30; x++) {
       drawSprite3(renderer, x * 16, y * 16, objmqp.tiles[x + y * tilemap.width]);
     }
   }
@@ -276,16 +283,13 @@ function render() {
     }
   }
 
+  renderer.layer = 2;
   if (game.messageBox) {
     drawTextbox(renderer, 16 * 8, 16 * 8, 40, game.messageBox);
   }
 
-  drawSprite3(renderer, 16 * 8, 16 * 4, spriteNames.castle);
-  drawSprite3(renderer, 16 * 9, 16 * 4, spriteNames.castle + 1);
-  drawSprite3(renderer, 16 * 8, 16 * 5, spriteNames.castle + 2);
-  drawSprite3(renderer, 16 * 8, 16 * 6, spriteNames.castle);
-
   //--- end nuke
+  renderer.sort();
   renderer.render();
 }
 

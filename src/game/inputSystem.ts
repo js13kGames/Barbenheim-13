@@ -49,7 +49,7 @@ export function inputSystem(game: Game) {
         (pos) =>
           (pos.x === startPos.x && pos.y === startPos.y) ||
           (pos.x === targetPos.x && pos.y === targetPos.y) ||
-          isFreeTile(game.ecs, game.tilemap!, pos),
+          isFreeTile(game.ecs, game.tilemap!, game.objmap!, pos),
         startPos,
         targetPos,
       );
@@ -58,7 +58,7 @@ export function inputSystem(game: Game) {
       const player = game.ecs.getComponent<PlayerComponent>(game.selectedEntity, "player")!;
       if (path && path.length > 0 && path.length <= player.speed) {
         const lastPos = path[path.length - 1];
-        const lastPosIsFree = isFreeTile(game.ecs, game.tilemap!, lastPos);
+        const lastPosIsFree = isFreeTile(game.ecs, game.tilemap!, game.objmap!, lastPos);
         if (!lastPosIsFree) {
           path.pop();
         }

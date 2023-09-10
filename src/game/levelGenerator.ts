@@ -77,9 +77,11 @@ export function generateLevel(tilemap: TileMap, objmap: TileMap) {
   createBridge(tilemap, rnd);
 }
 
-export function isFreeTile(ecs: Ecs, tilemap: TileMap, p: Point) {
+export function isFreeTile(ecs: Ecs, tilemap: TileMap, objmap: TileMap, p: Point) {
   if (p.x < 0 && p.y >= 0 && p.x < 30 && p.y < 16) return false;
   const tile = tilemap.getTile(p.x, p.y);
+  const obj = objmap.getTile(p.x, p.y);
+  if (obj !== -1) return false;
   return (tile === 16 * 1 + 7 || tile === 16 * 1 + 8) && !findSprite(ecs, p.x, p.y);
 }
 
