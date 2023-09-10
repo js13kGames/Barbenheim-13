@@ -125,7 +125,7 @@ export class Game {
         strength: 1,
         speed: 5,
       },
-      { type: "sprite", x: 21 * 16, y: 10 * 16, sprite: spriteNames.orc },
+      { type: "sprite", x: 26 * 16, y: 10 * 16, sprite: spriteNames.orc },
     );
 
     const foe2 = ecs.createEntity();
@@ -140,7 +140,7 @@ export class Game {
         strength: 1,
         speed: 5,
       },
-      { type: "sprite", x: 22 * 16, y: 12 * 16, sprite: spriteNames.orc },
+      { type: "sprite", x: 26 * 16, y: 13 * 16, sprite: spriteNames.orc },
     );
 
     const foe3 = ecs.createEntity();
@@ -155,7 +155,7 @@ export class Game {
         strength: 1,
         speed: 5,
       },
-      { type: "sprite", x: 23 * 16, y: 11 * 16, sprite: spriteNames.princess },
+      { type: "sprite", x: 25 * 16, y: 11 * 16, sprite: spriteNames.princess },
     );
 
     const dragon = ecs.createEntity();

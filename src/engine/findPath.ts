@@ -32,7 +32,13 @@ export function findPath(
     h: hDist(start, target),
     f: hDist(start, target),
   };
-  while (closed[`${target.x},${target.y}`] === undefined && Object.keys(open).length > 0) {
+
+  let bailout = 1000;
+  while (
+    closed[`${target.x},${target.y}`] === undefined &&
+    Object.keys(open).length > 0 &&
+    bailout-- > 0
+  ) {
     const current = Object.values(open).reduce((a, b) => (a.f < b.f ? a : b));
     delete open[`${current.x},${current.y}`];
     closed[`${current.x},${current.y}`] = current;
@@ -49,7 +55,7 @@ export function findPath(
       const f = g + h;
       const existingOpen = open[`${pos.x},${pos.y}`];
       const existingClosed = closed[`${pos.x},${pos.y}`];
-      if (existingClosed === undefined && (existingOpen === undefined || existingOpen.f > f)) {
+      if (existingClosed === undefined && existingOpen === undefined /*|| existingOpen.f > f*/) {
         open[`${pos.x},${pos.y}`] = {
           ...pos,
           g,
@@ -61,7 +67,13 @@ export function findPath(
     }
   }
 
+  if (bailout <= 0) {
+    console.log("bailout", open, closed);
+    return { found: false };
+  }
+
   const found = closed[`${target.x},${target.y}`] !== undefined;
+  if (!found) return { found: false };
   let current = found
     ? closed[`${target.x},${target.y}`]
     : Object.values(closed).reduce((a, b) => (a.h < b.h ? a : b));

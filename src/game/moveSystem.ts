@@ -79,7 +79,7 @@ export function moveSystem(game: Game) {
         updateStats(game, command);
         game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
         const shootComponent = game.ecs.getComponent<ShootComponent>(command.entity, "shoot");
-        if (shootComponent?.bullet === 16 * 4 + 1) {
+        if (shootComponent?.bullet === spriteNames.bomb) {
           game.tilemap?.setTile(command.pos.x, command.pos.y, spriteNames.scorched);
           game.nuke = { x: command.pos.x, y: command.pos.y, tStart: game.tick };
         }
