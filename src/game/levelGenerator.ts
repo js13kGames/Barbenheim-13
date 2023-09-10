@@ -82,12 +82,16 @@ export function isFreeTile(ecs: Ecs, tilemap: TileMap, objmap: TileMap, p: Point
   const tile = tilemap.getTile(p.x, p.y);
   const obj = objmap.getTile(p.x, p.y);
   if (obj !== -1) return false;
-  return (tile === 16 * 1 + 7 || tile === 16 * 1 + 8) && !findSprite(ecs, p.x, p.y);
+  return (
+    (tile === spriteNames.grass || tile === spriteNames.road || tile === spriteNames.scorched) &&
+    !findSprite(ecs, p.x, p.y)
+  );
 }
 
 export function findSprite(ecs: Ecs, x: number, y: number) {
   let sprite = ecs.getComponentsByType<SpriteComponent>("sprite").find((sprite) => {
     return ((sprite.x / 16) | 0) === (x | 0) && ((sprite.y / 16) | 0) === (y | 0);
   });
+  if (sprite?.sprite === spriteNames.skull) return undefined;
   return sprite;
 }

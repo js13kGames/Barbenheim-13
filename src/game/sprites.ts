@@ -9,6 +9,7 @@ export const spriteNames = {
   road: 16 * 1 + 8,
   water: 16 * 1 + 9,
   rocky: 16 * 1 + 10,
+  scorched: 16 * 4 + 5,
 
   mine: 16 * 2 + 12,
   attack: 16 * 2 + 11,

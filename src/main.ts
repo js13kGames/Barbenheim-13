@@ -88,7 +88,13 @@ function render() {
       drawSprite2(renderer, sprite.x, sprite.y, spriteNames.idle, 0.25 + Math.sin(t / 10) / 8);
     }
 
-    drawSprite2(renderer, sprite.x, sprite.y, sprite.sprite);
+    if (sprite.sprite === spriteNames.skull) {
+      renderer.layer = 0;
+      drawSprite2(renderer, sprite.x, sprite.y, sprite.sprite);
+      renderer.layer = 1;
+    } else {
+      drawSprite2(renderer, sprite.x, sprite.y, sprite.sprite);
+    }
     if (sprite.sprite === spriteNames.dragon1) {
       drawSprite2(renderer, sprite.x + 16, sprite.y, spriteNames.dragon2);
     }
@@ -237,12 +243,6 @@ function render() {
   drawPanel(renderer, 0, 0, 12, 3);
   drawText(renderer, 8, 8, game.side + " turn");
 
-  if (game.state === "win") {
-    drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You win!", true);
-  } else if (game.state === "lose") {
-    drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You lose!", true);
-  }
-
   if (game.nuke) {
     const { x, y, tStart } = game.nuke;
 
@@ -286,6 +286,11 @@ function render() {
   renderer.layer = 2;
   if (game.messageBox) {
     drawTextbox(renderer, 16 * 8, 16 * 8, 40, game.messageBox);
+  }
+  if (game.state === "win") {
+    drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You win!", true);
+  } else if (game.state === "lose") {
+    drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You lose!", true);
   }
 
   //--- end nuke

@@ -80,7 +80,7 @@ export function moveSystem(game: Game) {
         game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
         const shootComponent = game.ecs.getComponent<ShootComponent>(command.entity, "shoot");
         if (shootComponent?.bullet === 16 * 4 + 1) {
-          game.tilemap?.setTile(command.pos.x, command.pos.y, 16 * 4 + 5);
+          game.tilemap?.setTile(command.pos.x, command.pos.y, spriteNames.scorched);
           game.nuke = { x: command.pos.x, y: command.pos.y, tStart: game.tick };
         }
       }
