@@ -3,7 +3,7 @@ export const spriteNames = {
   idle: 16 * 1 + 5,
   selected: 16 * 1 + 11,
   greenDot: 16 * 1 + 8,
-  redDot: 16 * 2 + 10,
+  redDot: 16 * 1 + 10,
 
   grass: 16 * 4 + 0,
   water: 16 * 6 + 3,

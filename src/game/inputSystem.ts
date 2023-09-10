@@ -67,10 +67,10 @@ export function inputSystem(game: Game) {
           game.commandPreview.push({ entity: game.selectedEntity, type: "move", path, idx: 0 });
         }
         if (!lastPosIsFree) {
-          const lastTile = game.tilemap?.getTile(lastPos.x, lastPos.y) ?? -1;
+          const lastObj = game.objmap?.getTile(lastPos.x, lastPos.y) ?? -1;
           const action = game.ecs.getComponent<ActionComponent>(game.selectedEntity, "action")!;
           if (action) {
-            if (lastTile === spriteNames.mountain && action.actions.includes("mine")) {
+            if (lastObj === spriteNames.mountain && action.actions.includes("mine")) {
               game.commandPreview.push({
                 type: "mine",
                 entity: game.selectedEntity!,

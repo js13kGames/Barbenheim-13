@@ -125,7 +125,7 @@ export function generateLevel(tilemap: TileMap, objmap: TileMap) {
 }
 
 export function isFreeTile(ecs: Ecs, tilemap: TileMap, objmap: TileMap, p: Point) {
-  if (p.x < 0 || p.y < 0 || p.x >= 30 || p.y >= 16) return false;
+  if (p.x < 6 || p.y < 0 || p.x >= 30 || p.y >= 16) return false;
   const tile = tilemap.getTile(p.x, p.y);
   const obj = objmap.getTile(p.x, p.y);
   if (obj !== -1) return false;

@@ -60,6 +60,14 @@ function update() {
   moveSystem(game);
 }
 
+function drawStats(y: number, stats: PlayerComponent | FoeComponent) {
+  drawPanel(renderer, 0, (y += 8), 12, 7);
+  drawText(renderer, 8, (y += 8), stats.baseClass);
+  drawText(renderer, 8, (y += 16), "HP: " + stats.health + "/" + stats.maxHealth);
+  drawText(renderer, 8, (y += 8), "AP: " + stats.strength);
+  drawText(renderer, 8, (y += 8), "MP: " + stats.speed);
+}
+
 function render() {
   const t = game.tick;
 
@@ -210,11 +218,7 @@ function render() {
   const stats = game.ecs.getComponent<PlayerComponent>(game.selectedEntity!, "player")!;
   if (stats) {
     let y = 16;
-    drawPanel(renderer, 0, (y += 8), 12, 7);
-    drawText(renderer, 8, (y += 8), stats.baseClass);
-    drawText(renderer, 8, (y += 16), "HP: " + stats.health + "/" + stats.maxHealth);
-    drawText(renderer, 8, (y += 8), "AP: " + stats.strength);
-    drawText(renderer, 8, (y += 8), "MP: " + stats.speed);
+    drawStats(y, stats);
   }
 
   const hoveredSprite = findSprite(game.ecs, game.cursor.x / 16, game.cursor.y / 16);
@@ -222,20 +226,12 @@ function render() {
     const foeStats = game.ecs.getComponent<FoeComponent>(hoveredSprite.entity, "foe")!;
     if (foeStats) {
       let y = 16 + 8 * 7;
-      drawPanel(renderer, 0, (y += 8), 12, 7);
-      drawText(renderer, 8, (y += 8), foeStats.baseClass);
-      drawText(renderer, 8, (y += 16), "HP: " + foeStats.health + "/" + foeStats.maxHealth);
-      drawText(renderer, 8, (y += 8), "AP: " + foeStats.strength);
-      drawText(renderer, 8, (y += 8), "MP: " + foeStats.speed);
+      drawStats(y, foeStats);
     } else if (game.selectedEntity === null) {
       const playerStats = game.ecs.getComponent<PlayerComponent>(hoveredSprite.entity, "player")!;
       if (playerStats) {
         let y = 16;
-        drawPanel(renderer, 0, (y += 8), 12, 7);
-        drawText(renderer, 8, (y += 8), playerStats.baseClass);
-        drawText(renderer, 8, (y += 16), "HP: " + playerStats.health + "/" + playerStats.maxHealth);
-        drawText(renderer, 8, (y += 8), "AP: " + playerStats.strength);
-        drawText(renderer, 8, (y += 8), "MP: " + playerStats.speed);
+        drawStats(y, playerStats);
       }
     }
   }
