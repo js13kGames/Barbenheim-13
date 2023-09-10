@@ -45,7 +45,7 @@ export function inputSystem(game: Game) {
       const selectedSprite = game.ecs.getComponent<SpriteComponent>(game.selectedEntity, "sprite")!;
       const startPos = getTilePos(selectedSprite);
       const targetPos = getTilePos(game.cursor);
-      const path = findPath(
+      const pathObj = findPath(
         (pos) =>
           (pos.x === startPos.x && pos.y === startPos.y) ||
           (pos.x === targetPos.x && pos.y === targetPos.y) ||
@@ -53,6 +53,7 @@ export function inputSystem(game: Game) {
         startPos,
         targetPos,
       );
+      const path = pathObj.path;
 
       game.commandPreview = [];
       const player = game.ecs.getComponent<PlayerComponent>(game.selectedEntity, "player")!;

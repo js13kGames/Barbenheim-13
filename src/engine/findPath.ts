@@ -21,11 +21,11 @@ export function findPath(
   isFree: (pos: Point) => boolean,
   start: Point,
   target: Point,
-): Point[] | undefined {
+): { found: boolean; path?: Point[] } {
   // a-star, mostly implemented by copilot
   const open: Record<string, Cell> = {};
   const closed: Record<string, Cell> = {};
-  if (!isFree(start) || !isFree(target)) return undefined;
+  if (!isFree(start) || !isFree(target)) return { found: false };
   open[`${start.x},${start.y}`] = {
     ...start,
     g: 0,
@@ -60,14 +60,19 @@ export function findPath(
       }
     }
   }
-  if (closed[`${target.x},${target.y}`] === undefined) return undefined;
+
+  const found = closed[`${target.x},${target.y}`] !== undefined;
+  let current = found
+    ? closed[`${target.x},${target.y}`]
+    : Object.values(closed).reduce((a, b) => (a.h < b.h ? a : b));
+
   const path: Point[] = [];
-  let current = closed[`${target.x},${target.y}`];
   while (current.parent !== undefined) {
     path.push(current);
     current = current.parent;
   }
-  return path.reverse();
+
+  return { found, path: path.reverse() };
 }
 
 export function hDist(a: Point, b: Point) {

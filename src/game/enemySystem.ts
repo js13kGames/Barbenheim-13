@@ -36,7 +36,7 @@ export function enemySystem(game: Game) {
     const playerPos = getTilePos(playerSprite);
     const foePos = getTilePos(foeSprite);
 
-    const path = findPath(
+    const pathObj = findPath(
       (p) =>
         (p.x === foePos.x && p.y === foePos.y) ||
         (p.x === playerPos.x && p.y === playerPos.y) ||
@@ -44,6 +44,7 @@ export function enemySystem(game: Game) {
       foePos,
       playerPos,
     );
+    const path = pathObj.path;
     if (path && path.length > 0) {
       let lastIndex = Math.min(path.length - 1, foe.speed);
       const lastPos = path[lastIndex];
