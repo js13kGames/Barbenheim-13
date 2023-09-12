@@ -8,9 +8,8 @@ import {
   drawText,
   drawTextbox,
 } from "./engine/renderUtils.ts";
-import { TileMap } from "./engine/tilemap.ts";
 import { Game } from "./game/game.ts";
-import { findSprite, generateLevel } from "./game/levelGenerator.ts";
+import { findSprite } from "./game/levelGenerator.ts";
 import {
   FoeComponent,
   PlayerComponent,
@@ -22,7 +21,7 @@ import { moveSystem } from "./game/moveSystem.ts";
 import { enemySystem } from "./game/enemySystem.ts";
 import { spriteNames } from "./game/sprites.ts";
 import { AttackCommand, MineCommand, ShootCommand } from "./game/commands.ts";
-import { story } from "./game/story.ts";
+import { levels } from "./game/levels.ts";
 
 const pixelSize = 4;
 const canvas = createCanvas(1920, 1080);
@@ -33,7 +32,7 @@ loadImage("barbenheim13.png", (img) => {
   renderer.setTexture(img);
 });
 
-const game = new Game();
+const game = new Game(levels);
 
 canvas.addEventListener("mousemove", (e) => {
   game.cursor.x = (e.offsetX / 16) * pixelSize;
@@ -44,14 +43,7 @@ canvas.addEventListener("click", () => {
   game.eventQueue.push({ type: "click", pos: { ...game.cursor } });
 });
 
-const tilemap = new TileMap(30, 17);
-const objmqp = new TileMap(30, 17);
-generateLevel(tilemap, objmqp);
-game.tilemap = tilemap;
-game.objmap = objmqp;
-
 game.init();
-game.messageBox = story[0];
 
 function update() {
   game.tick++;
@@ -70,6 +62,8 @@ function drawStats(y: number, stats: PlayerComponent | FoeComponent) {
 
 function render() {
   const t = game.tick;
+  const tilemap = game.tilemap!;
+  const objmap = game.objmap!;
 
   renderer.layer = 0;
   for (let y = 0; y < 17; y++) {
@@ -81,7 +75,7 @@ function render() {
   renderer.layer = 1;
   for (let y = 0; y < 17; y++) {
     for (let x = 6; x < 30; x++) {
-      drawSprite3(renderer, x * 16, y * 16, objmqp.tiles[x + y * tilemap.width]);
+      drawSprite3(renderer, x * 16, y * 16, objmap.tiles[x + y * tilemap.width]);
     }
   }
 

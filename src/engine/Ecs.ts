@@ -21,6 +21,12 @@ export class Ecs {
     return this.seq++;
   }
 
+  createEntityFromPrefab(prefab: any) {
+    const entity = this.createEntity();
+    this.addComponents(entity, ...structuredClone(prefab));
+    return entity;
+  }
+
   removeEntity(entity: Entity) {
     this.getComponentsByEntity(entity).forEach((component) => {
       const components = this.getComponentsByType(component.type);

@@ -4,6 +4,7 @@ import { Point } from "../engine/findPath.ts";
 import { SpriteComponent } from "./components.ts";
 import { spriteNames } from "./sprites.ts";
 import { Random } from "../engine/random.ts";
+import { Level } from "./levels.ts";
 
 function fillMap(tilemap: TileMap, tile: number) {
   for (let y = 0; y < tilemap.height; y++) {
@@ -13,6 +14,7 @@ function fillMap(tilemap: TileMap, tile: number) {
   }
 }
 
+// @ts-ignore
 function createRiver(tilemap: TileMap, rnd: Random) {
   let x1 = tilemap.width / 2;
   let x2 = x1 + 1;
@@ -34,6 +36,7 @@ function createRiver(tilemap: TileMap, rnd: Random) {
 
 type Compass = "n" | "s" | "e" | "w";
 
+// @ts-ignore
 function createBridge(tilemap: TileMap, rnd: Random) {
   let y = 0.25 * tilemap.height + rnd.inext(tilemap.height * 0.5);
   let x = 0;
@@ -86,40 +89,41 @@ function createBridge(tilemap: TileMap, rnd: Random) {
   }
 }
 
-function createTerrain(tilemap: TileMap, _rnd: Random) {
+function createTerrain(tilemap: TileMap, rnd: Random) {
   for (let y = 0; y < tilemap.height; y++) {
     for (let x = 0; x < tilemap.width; x++) {
-      const tile = spriteNames.grass;
+      const tile = spriteNames.grass + (rnd.next() > 0.5 ? 0 : -16);
       tilemap.setTile(x, y, tile | 0);
     }
   }
 }
 
-export function generateLevel(tilemap: TileMap, objmap: TileMap) {
-  const rnd = new Random(16);
-  fillMap(tilemap, spriteNames.grass);
+export function generateLevel(tilemap: TileMap, objmap: TileMap, spec: Level) {
+  const rnd = new Random(spec.seed);
   fillMap(objmap, -1);
   createTerrain(tilemap, rnd);
-  createRiver(tilemap, rnd);
-  createBridge(tilemap, rnd);
 
-  for (let i = 0; i < 30; i++) {
-    const x = rnd.inext(tilemap.width);
-    const y = rnd.inext(tilemap.height);
-    if (tilemap.getTile(x | 0, y | 0) === spriteNames.grass) {
-      if (i % 2 === 0) {
+  if (spec.river) {
+    createRiver(tilemap, rnd);
+    createBridge(tilemap, rnd);
+  }
+  if (spec.mountains) {
+    for (let i = 0; i < spec.mountains; i++) {
+      const x = rnd.inext(tilemap.width);
+      const y = rnd.inext(tilemap.height);
+      if (tilemap.getTile(x | 0, y | 0) === spriteNames.grass) {
         objmap.setTile(x | 0, y | 0, spriteNames.mountain);
-      } else {
-        objmap.setTile(x | 0, y | 0, spriteNames.tree);
       }
     }
   }
 
-  for (let i = 0; i < 7; i++) {
-    const x = rnd.inext(tilemap.width);
-    const y = rnd.inext(tilemap.height);
-    if (tilemap.getTile(x | 0, y | 0) === spriteNames.grass) {
-      objmap.setTile(x | 0, y | 0, spriteNames.castle);
+  if (spec.trees) {
+    for (let i = 0; i < spec.trees; i++) {
+      const x = rnd.inext(tilemap.width);
+      const y = rnd.inext(tilemap.height);
+      if (tilemap.getTile(x | 0, y | 0) === spriteNames.grass) {
+        objmap.setTile(x | 0, y | 0, spriteNames.tree);
+      }
     }
   }
 }

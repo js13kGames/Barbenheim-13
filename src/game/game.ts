@@ -2,7 +2,9 @@ import { Ecs, Entity } from "../engine/Ecs.ts";
 import { TileMap } from "../engine/tilemap.ts";
 import { Command } from "./commands.ts";
 import { Point } from "../engine/findPath.ts";
-import { spriteNames } from "./sprites.ts";
+import { generateLevel } from "./levelGenerator.ts";
+import { Level } from "./levels.ts";
+import { SpriteComponent } from "./components.ts";
 
 export interface Cursor {
   x: number;
@@ -11,6 +13,7 @@ export interface Cursor {
 
 export class Game {
   tick = 0;
+  level = 0;
   turn = 0;
   ecs = new Ecs();
   selectedEntity: Entity | null = null;
@@ -29,150 +32,29 @@ export class Game {
   nuke: { x: number; y: number; tStart: number } | null = null;
   messageBox: string | null = null;
 
+  constructor(public levels: Level[]) {}
+
   init() {
+    this.tilemap = new TileMap(30, 17);
+    this.objmap = new TileMap(30, 17);
+    this.populateLevel();
+  }
+
+  populateLevel() {
+    this.side = "player";
+    const levelSpec = this.levels[this.level];
+    generateLevel(this.tilemap!, this.objmap!, levelSpec);
+    this.messageBox = levelSpec.prompt;
+
     const ecs = this.ecs;
-
-    const player = ecs.createEntity();
-    ecs.addComponents(
-      player,
-      {
-        type: "player",
-        moved: false,
-        baseClass: "swordsman",
-        health: 15,
-        maxHealth: 15,
-        strength: 7,
-        speed: 5,
-      },
-      { type: "sprite", x: 9 * 16, y: 3 * 16, sprite: spriteNames.swordsman },
-      { type: "action", actions: ["attack"] },
-    );
-
-    const player2 = ecs.createEntity();
-    ecs.addComponents(
-      player2,
-      {
-        type: "player",
-        moved: false,
-        baseClass: "dwarf",
-        health: 17,
-        maxHealth: 17,
-        strength: 5,
-        speed: 5,
-      },
-      { type: "sprite", x: 9 * 16, y: 5 * 16, sprite: spriteNames.dwarf },
-      { type: "action", actions: ["mine", "attack"] },
-    );
-
-    const player3 = ecs.createEntity();
-    ecs.addComponents(
-      player3,
-      {
-        type: "player",
-        moved: false,
-        baseClass: "archer",
-        health: 12,
-        maxHealth: 12,
-        strength: 3,
-        speed: 5,
-      },
-      { type: "sprite", x: 6 * 16, y: 4 * 16, sprite: spriteNames.archer },
-      { type: "shoot", bullet: spriteNames.arrow },
-      { type: "ranged", range: 10, action: "attack" },
-    );
-
-    const player4 = ecs.createEntity();
-    ecs.addComponents(
-      player4,
-      {
-        type: "player",
-        moved: false,
-        baseClass: "trebuchet",
-        health: 7,
-        maxHealth: 7,
-        strength: 99,
-        speed: 3,
-      },
-      { type: "sprite", x: 6 * 16, y: 6 * 16, sprite: spriteNames.trebuchet },
-      { type: "shoot", bullet: spriteNames.bomb },
-      { type: "ranged", range: 10, action: "attack" },
-    );
-
-    const player5 = ecs.createEntity();
-    ecs.addComponents(
-      player5,
-      {
-        type: "player",
-        moved: false,
-        baseClass: "king",
-        health: 7,
-        maxHealth: 7,
-        strength: 99,
-        speed: 3,
-      },
-      { type: "sprite", x: 6 * 16, y: 2 * 16, sprite: spriteNames.king },
-    );
-
-    const foe = ecs.createEntity();
-    ecs.addComponents(
-      foe,
-      {
-        type: "foe",
-        moved: false,
-        baseClass: "orc",
-        health: 10,
-        maxHealth: 10,
-        strength: 1,
-        speed: 5,
-      },
-      { type: "sprite", x: 26 * 16, y: 10 * 16, sprite: spriteNames.orc },
-    );
-
-    const foe2 = ecs.createEntity();
-    ecs.addComponents(
-      foe2,
-      {
-        type: "foe",
-        moved: false,
-        baseClass: "orc",
-        health: 10,
-        maxHealth: 10,
-        strength: 1,
-        speed: 5,
-      },
-      { type: "sprite", x: 26 * 16, y: 13 * 16, sprite: spriteNames.orc },
-    );
-
-    const foe3 = ecs.createEntity();
-    ecs.addComponents(
-      foe3,
-      {
-        type: "foe",
-        moved: false,
-        baseClass: "princess",
-        health: 10,
-        maxHealth: 10,
-        strength: 1,
-        speed: 5,
-      },
-      { type: "sprite", x: 25 * 16, y: 11 * 16, sprite: spriteNames.princess },
-    );
-
-    const dragon = ecs.createEntity();
-    ecs.addComponents(
-      dragon,
-      {
-        type: "foe",
-        moved: false,
-        baseClass: "dragon",
-        health: 57,
-        maxHealth: 57,
-        strength: 11,
-        speed: 3,
-      },
-      { type: "sprite", x: 23 * 16, y: 9 * 16, sprite: spriteNames.dragon1 },
-      { type: "shoot", bullet: spriteNames.fireball },
-      { type: "ranged", range: 10, action: "attack" },
-    );
+    ecs.clear();
+    for (const spec of levelSpec.entities) {
+      const entity = ecs.createEntityFromPrefab(spec.prefab);
+      if (spec.position) {
+        const sprite = ecs.getComponent<SpriteComponent>(entity, "sprite")!;
+        sprite.x = spec.position.x * 16;
+        sprite.y = spec.position.y * 16;
+      }
+    }
   }
 }

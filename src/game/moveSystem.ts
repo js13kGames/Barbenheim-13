@@ -25,16 +25,19 @@ function updateStats(game: Game, command: AttackCommand | ShootCommand) {
         sprite: spriteNames.skull,
       });
 
-      if (game.side === "player") {
-        const foeCount = game.ecs.getComponentsByType<FoeComponent>("foe").length;
-        if (foeCount === 0) {
+      const foeCount = game.ecs.getComponentsByType<FoeComponent>("foe").length;
+      if (foeCount === 0) {
+        game.level++;
+        if (game.level >= game.levels.length) {
           game.state = "win";
+        } else {
+          game.populateLevel();
         }
-      } else {
-        const playerCount = game.ecs.getComponentsByType<PlayerComponent>("player").length;
-        if (playerCount === 0) {
-          game.state = "lose";
-        }
+      }
+
+      const playerCount = game.ecs.getComponentsByType<PlayerComponent>("player").length;
+      if (playerCount === 0) {
+        game.state = "lose";
       }
     }
   }
