@@ -61,6 +61,7 @@ export function enemySystem(game: Game) {
             type: "move",
             path: path.slice(0, lastIndex),
             idx: 0,
+            speed: foe.speed,
           });
         }
         const player = game.ecs.getComponent<PlayerComponent>(sprite.entity, "player");
@@ -80,6 +81,7 @@ export function enemySystem(game: Game) {
           type: "move",
           path: path.slice(0, foe!.speed),
           idx: 0,
+          speed: foe.speed,
         });
 
         const shooter = game.ecs.getComponent<ShootComponent>(foe.entity, "shoot")!;

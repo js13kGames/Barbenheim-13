@@ -31,10 +31,10 @@ export function inputSystem(game: Game) {
           game.selectedEntity = sprite.entity;
         } else {
           if (game.commandPreview.length > 0 && game.selectedEntity !== null) {
+            const player = game.ecs.getComponent<PlayerComponent>(game.selectedEntity, "player")!;
+            player.moved = true;
             game.commandQueue.push(...game.commandPreview);
             game.commandPreview = [];
-            const player = game.ecs.getComponent<PlayerComponent>(game.selectedEntity, "player")!;
-            player!.moved = true;
           }
           game.selectedEntity = null;
         }
@@ -57,14 +57,20 @@ export function inputSystem(game: Game) {
 
       game.commandPreview = [];
       const player = game.ecs.getComponent<PlayerComponent>(game.selectedEntity, "player")!;
-      if (path && path.length > 0 && path.length <= player.speed) {
+      if (path && path.length > 0) {
         const lastPos = path[path.length - 1];
         const lastPosIsFree = isFreeTile(game.ecs, game.tilemap!, game.objmap!, lastPos);
         if (!lastPosIsFree) {
           path.pop();
         }
         if (path.length > 0) {
-          game.commandPreview.push({ entity: game.selectedEntity, type: "move", path, idx: 0 });
+          game.commandPreview.push({
+            entity: game.selectedEntity,
+            type: "move",
+            path: path,
+            idx: 0,
+            speed: player.speed,
+          });
         }
         if (!lastPosIsFree) {
           const lastObj = game.objmap?.getTile(lastPos.x, lastPos.y) ?? -1;
@@ -97,18 +103,29 @@ export function inputSystem(game: Game) {
 
       const cursorSprite = findSprite(game.ecs, targetPos.x, targetPos.y);
       const rangedComponent = game.ecs.getComponent<RangedComponent>(player.entity, "ranged");
-      if (rangedComponent && cursorSprite) {
-        const foe = game.ecs.getComponent<FoeComponent>(cursorSprite.entity, "foe");
-        if (hDist(targetPos, startPos) <= rangedComponent.range && foe) {
-          if (game.commandPreview.length > 0) {
-            game.commandPreview.pop();
-          }
+      if (rangedComponent && (cursorSprite || game.commandPreview.length > 0)) {
+        const foe = cursorSprite && game.ecs.getComponent<FoeComponent>(cursorSprite.entity, "foe");
+        let outOfReach = false;
+        const lastMove = game.commandPreview.pop();
+        if (lastMove?.type === "move") {
+          outOfReach = lastMove.path.length > lastMove.speed;
+        }
+        if (foe && hDist(targetPos, startPos) <= rangedComponent.range) {
           game.commandPreview.push({
             type: "shoot",
             entity: game.selectedEntity!,
             pos: targetPos,
             idx: 0,
           });
+        } else if (outOfReach && hDist(targetPos, startPos) <= rangedComponent.range) {
+          game.commandPreview.push({
+            type: "shoot",
+            entity: game.selectedEntity!,
+            pos: targetPos,
+            idx: 0,
+          });
+        } else if (lastMove) {
+          game.commandPreview.push(lastMove);
         }
       }
     }

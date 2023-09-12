@@ -1,5 +1,5 @@
 import { Point } from "../engine/findPath.ts";
-import { archer, dragon, dwarf, orc, princess, swordsman } from "./prefabs.ts";
+import { archer, dragon, dwarf, king, orc, princess, swordsman } from "./prefabs.ts";
 
 export interface Instance {
   prefab: any[];
@@ -16,14 +16,14 @@ export interface Level {
 }
 
 export const levels: Level[] = [
-  {
-    prompt: "Welcome to the game!",
-    seed: 131313,
-    river: true,
-    entities: [{ prefab: archer }, { prefab: orc }],
-    mountains: 10,
-    trees: 10,
-  },
+  // {
+  //   prompt: "Welcome to the game!",
+  //   seed: 131313,
+  //   river: true,
+  //   mountains: 10,
+  //   trees: 10,
+  //   entities: [{ prefab: archer }, { prefab: orc }],
+  // },
   {
     prompt: "A bigger challenge!",
     seed: 0,
@@ -33,6 +33,7 @@ export const levels: Level[] = [
       { prefab: swordsman },
       { prefab: swordsman, position: { x: 9, y: 4 } },
       { prefab: dwarf, position: { x: 9, y: 5 } },
+      { prefab: king },
       { prefab: archer },
       { prefab: orc },
       { prefab: dragon },

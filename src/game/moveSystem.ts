@@ -56,7 +56,7 @@ export function moveSystem(game: Game) {
       sprite.y += Math.sign(next.y * 16 - sprite.y);
       if (sprite.x === next.x * 16 && sprite.y === next.y * 16) {
         command.idx++;
-        if (command.idx >= path.length) {
+        if (command.idx >= command.speed || command.idx >= path.length) {
           game.commandQueue.splice(game.commandQueue.indexOf(command), 1);
         }
       }

@@ -112,7 +112,13 @@ function render() {
         case "move": {
           // @ts-ignore
           command.path.forEach((p, idx) => {
-            drawSprite2(renderer, p.x * 16, p.y * 16, spriteNames.greenDot, 1);
+            drawSprite2(
+              renderer,
+              p.x * 16,
+              p.y * 16,
+              spriteNames.greenDot,
+              idx < command.speed ? 1 : 0.2,
+            );
           });
           break;
         }

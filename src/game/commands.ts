@@ -6,6 +6,7 @@ export interface MoveCommand {
   type: "move";
   path: Point[];
   idx: number;
+  speed: number;
 }
 
 export interface MineCommand {
