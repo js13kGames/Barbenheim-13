@@ -68,7 +68,7 @@ export const king = [
     strength: 99,
     speed: 3,
   },
-  { type: "sprite", x: 6 * 16, y: 2 * 16, sprite: spriteNames.king },
+  { type: "sprite", x: 10 * 16, y: 6 * 16, sprite: spriteNames.king },
   { type: "action", actions: ["attack"] },
 ];
 

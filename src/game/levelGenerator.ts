@@ -37,7 +37,7 @@ function createRiver(tilemap: TileMap, rnd: Random) {
 type Compass = "n" | "s" | "e" | "w";
 
 // @ts-ignore
-function createBridge(tilemap: TileMap, rnd: Random) {
+function createBridge(tilemap: TileMap, objmap: TileMap, rnd: Random) {
   let y = 0.25 * tilemap.height + rnd.inext(tilemap.height * 0.5);
   let x = 0;
 
@@ -73,6 +73,7 @@ function createBridge(tilemap: TileMap, rnd: Random) {
       tile = spriteNames.bridge;
       dir = "e";
     }
+    objmap.setTile(x | 0, y | 0, -1);
     tilemap.setTile(x | 0, y | 0, tile);
     switch (dir) {
       case "n":
@@ -136,7 +137,6 @@ export function generateLevel(tilemap: TileMap, objmap: TileMap, spec: Level) {
 
   if (spec.river) {
     createRiver(tilemap, rnd);
-    createBridge(tilemap, rnd);
   }
 
   if (spec.castle) {
@@ -164,6 +164,10 @@ export function generateLevel(tilemap: TileMap, objmap: TileMap, spec: Level) {
         objmap.setTile(x | 0, y | 0, spriteNames.tree);
       }
     }
+  }
+
+  if (spec.road) {
+    createBridge(tilemap, objmap, rnd);
   }
 }
 

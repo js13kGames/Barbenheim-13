@@ -18,7 +18,12 @@ export function inputSystem(game: Game) {
   if (game.messageBox) {
     game.eventQueue.forEach((event) => {
       if (event.type === "click") {
-        game.messageBox = null;
+        game.msgIndex++;
+        if (game.msgIndex < game.levels[game.level].prompt.length) {
+          game.messageBox = game.levels[game.level].prompt[game.msgIndex];
+        } else {
+          game.messageBox = null;
+        }
       }
     });
   } else if (game.side === "player") {

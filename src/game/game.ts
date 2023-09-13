@@ -31,6 +31,7 @@ export class Game {
   state: "playing" | "win" | "lose" = "playing";
   nuke: { x: number; y: number; tStart: number } | null = null;
   messageBox: string | null = null;
+  msgIndex = 0;
 
   constructor(public levels: Level[]) {}
 
@@ -44,7 +45,8 @@ export class Game {
     this.side = "player";
     const levelSpec = this.levels[this.level];
     generateLevel(this.tilemap!, this.objmap!, levelSpec);
-    this.messageBox = levelSpec.prompt;
+    this.msgIndex = 0;
+    this.messageBox = levelSpec.prompt[this.msgIndex];
 
     const ecs = this.ecs;
     ecs.clear();
