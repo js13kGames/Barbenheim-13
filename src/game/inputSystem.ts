@@ -25,6 +25,11 @@ export function inputSystem(game: Game) {
     game.eventQueue.forEach((event) => {
       if (event.type === "click") {
         const pos: Cursor = event.pos;
+        if (pos.x < 6 * 16 && pos.y > 15 * 16 + 8) {
+          if (game.side === "player" && game.state == "playing") {
+            game.endTurn();
+          }
+        }
         const sprite = findSprite(game.ecs, (pos.x / 16) | 0, (pos.y / 16) | 0);
         const player = sprite && game.ecs.getComponent<PlayerComponent>(sprite.entity, "player");
         if (sprite && player && !player.moved) {
@@ -134,13 +139,7 @@ export function inputSystem(game: Game) {
       return !c.moved;
     });
     if (!freePlayer) {
-      game.side = "foe";
-      game.ecs.getComponentsByType<PlayerComponent>("player").forEach((c) => {
-        c.moved = false;
-      });
-      game.ecs.getComponentsByType<PlayerComponent>("foe").forEach((c) => {
-        c.moved = false;
-      });
+      game.endTurn();
     }
   }
   game.eventQueue.length = 0;

@@ -4,7 +4,7 @@ import { Command } from "./commands.ts";
 import { Point } from "../engine/findPath.ts";
 import { generateLevel } from "./levelGenerator.ts";
 import { Level } from "./levels.ts";
-import { SpriteComponent } from "./components.ts";
+import { PlayerComponent, SpriteComponent } from "./components.ts";
 
 export interface Cursor {
   x: number;
@@ -56,5 +56,15 @@ export class Game {
         sprite.y = spec.position.y * 16;
       }
     }
+  }
+
+  endTurn() {
+    this.side = "foe";
+    this.ecs.getComponentsByType<PlayerComponent>("player").forEach((c) => {
+      c.moved = false;
+    });
+    this.ecs.getComponentsByType<PlayerComponent>("foe").forEach((c) => {
+      c.moved = false;
+    });
   }
 }

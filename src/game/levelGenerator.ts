@@ -98,6 +98,36 @@ function createTerrain(tilemap: TileMap, rnd: Random) {
   }
 }
 
+function createCastle(tilemap: TileMap, objmap: TileMap, rnd: Random) {
+  const castleWidth = 6;
+  const castleHeight = 8;
+  const castleX = 8;
+  const castleY = 3;
+  for (let y = 0; y < castleHeight; y++) {
+    for (let x = 0; x < castleWidth; x++) {
+      let tile = 0;
+      if (x === 0 || x === castleWidth - 1) {
+        tile = spriteNames.castle + 2;
+      }
+      if (y === 0 || y === castleHeight - 1) {
+        tile = spriteNames.castle + 1;
+      }
+      if ((x === 0 || x === castleWidth - 1) && (y === 0 || y === castleHeight - 1)) {
+        tile = spriteNames.castle;
+      }
+      if ((x === 0 || x === castleWidth - 1) && (y === 3 || y === 4)) {
+        tile = 0;
+      }
+      if ((x === 0 || x === castleWidth - 1) && (y === 2 || y === 5)) {
+        tile = spriteNames.castle;
+      }
+      if (tile > 0) {
+        objmap.setTile(castleX + x, castleY + y, tile);
+      }
+    }
+  }
+}
+
 export function generateLevel(tilemap: TileMap, objmap: TileMap, spec: Level) {
   const rnd = new Random(spec.seed);
   fillMap(objmap, -1);
@@ -107,11 +137,19 @@ export function generateLevel(tilemap: TileMap, objmap: TileMap, spec: Level) {
     createRiver(tilemap, rnd);
     createBridge(tilemap, rnd);
   }
+
+  if (spec.castle) {
+    createCastle(tilemap, objmap, rnd);
+  }
+
   if (spec.mountains) {
     for (let i = 0; i < spec.mountains; i++) {
       const x = rnd.inext(tilemap.width);
       const y = rnd.inext(tilemap.height);
-      if (tilemap.getTile(x | 0, y | 0) === spriteNames.grass) {
+      if (
+        tilemap.getTile(x | 0, y | 0) < spriteNames.water &&
+        objmap.getTile(x | 0, y | 0) === -1
+      ) {
         objmap.setTile(x | 0, y | 0, spriteNames.mountain);
       }
     }

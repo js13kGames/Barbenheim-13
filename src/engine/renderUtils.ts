@@ -63,7 +63,7 @@ export function drawButton(
   if (currentLine.length > 0) {
     lines.push(currentLine.join(" "));
   }
-  drawPanel(renderer, x, y, w, lines.length + 2, 32 * 21 + 1);
+  drawPanel(renderer, x, y, w, lines.length + 2, 32 * 3 + 4);
   lines.forEach((line, i) => {
     const leftPad = centered ? 7 + (maxWidth - line.length * 7) / 2 : 8;
     drawText(renderer, x + leftPad, y + 8 + i * 8, line);

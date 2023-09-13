@@ -2,6 +2,7 @@ import "./style.css";
 import { createCanvas, gameLoop, loadImage } from "./engine/gl-util.ts";
 import { SpriteRenderer } from "./engine/SpriteRenderer.ts";
 import {
+  drawButton,
   drawPanel,
   drawSprite2,
   drawSprite3,
@@ -82,12 +83,12 @@ function render() {
   game.ecs.getComponentsByType<SpriteComponent>("sprite").forEach((sprite) => {
     const playerComponent = game.ecs.getComponent<PlayerComponent>(sprite.entity, "player");
     if (playerComponent && !playerComponent.moved && game.side === "player") {
-      drawSprite2(renderer, sprite.x, sprite.y, spriteNames.idle, 0.25 + Math.sin(t / 10) / 8);
+      drawSprite2(renderer, sprite.x, sprite.y, spriteNames.idle, 0.5 + Math.sin(t / 10) / 8);
     }
 
     const foeComponent = game.ecs.getComponent<FoeComponent>(sprite.entity, "foe");
     if (foeComponent && !foeComponent.moved && game.side === "foe") {
-      drawSprite2(renderer, sprite.x, sprite.y, spriteNames.idle, 0.25 + Math.sin(t / 10) / 8);
+      drawSprite2(renderer, sprite.x, sprite.y, spriteNames.idle, 0.5 + Math.sin(t / 10) / 8);
     }
 
     if (sprite.sprite === spriteNames.skull) {
@@ -239,6 +240,7 @@ function render() {
   drawPanel(renderer, 0, 0, 12, 3);
   drawText(renderer, 8, 8, game.side + " turn");
 
+  renderer.layer = 3;
   if (game.nuke) {
     const { x, y, tStart } = game.nuke;
 
@@ -246,19 +248,24 @@ function render() {
     const t2 = (0.7 * (t - tStart)) % 32;
     const alpha = (32 - t2) / 32;
     if (t2 > 16) {
-      drawSprite2(renderer, 16 * x, 16 * (y - 1), 16 * 7 + (Math.random() > 0.5 ? 16 : 0), alpha);
+      drawSprite2(
+        renderer,
+        16 * x,
+        16 * (y - 1),
+        16 * 4 + 4 + (Math.random() > 0.5 ? 16 : 0),
+        alpha,
+      );
     }
-    drawSprite2(renderer, 16 * x, 16 * y, 16 * 7 + (Math.random() > 0.5 ? 16 : 0), alpha);
+    drawSprite2(renderer, 16 * x, 16 * y, 16 * 4 + 4 + (Math.random() > 0.5 ? 16 : 0), alpha);
+    drawSprite2(renderer, 16 * x - 8, 16 * y - t2, 16 * 3 + 4, alpha, 0, 2 - alpha);
+    drawSprite2(renderer, 16 * (x + 1) - 8, 16 * y - t2, 16 * 3 + 5, alpha, 0, 2 - alpha);
 
-    drawSprite2(renderer, 16 * x - 8, 16 * y - t2, 16 * 6, alpha, 0, 2 - alpha);
-    drawSprite2(renderer, 16 * (x + 1) - 8, 16 * y - t2, 16 * 6 + 1, alpha, 0, 2 - alpha);
-
-    drawSprite2(renderer, 16 * x - 8, 16 * y - t2, 16 * 8 + 2, alpha * 0.7, -t2 / 5, 3 - alpha);
+    drawSprite2(renderer, 16 * x - 8, 16 * y - t2, 16 * 4 + 6, alpha * 0.7, -t2 / 5, 3 - alpha);
     drawSprite2(
       renderer,
       16 * (x + 1) - 8 + t2 * 0.15,
       16 * y - t2,
-      16 * 8 + 2,
+      16 * 4 + 6,
       alpha * 0.7,
       t2 / 5,
       3 - alpha,
@@ -269,11 +276,12 @@ function render() {
         renderer,
         16 * x + Math.random() * 24 - 12,
         16 * y + 8,
-        16 * 6 + 4 + (Math.random() < 0.25 ? 0 : 1),
+        16 * 3 + 8 + (Math.random() < 0.5 ? 0 : 14),
         alpha,
         Math.sin(t),
       );
     }
+
     if (t2 >= 31) {
       game.nuke = null;
     }
@@ -287,6 +295,10 @@ function render() {
     drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You win!", true);
   } else if (game.state === "lose") {
     drawTextbox(renderer, 16 * 8, 16 * 8, 40, "You lose!", true);
+  }
+
+  if (game.side === "player" && game.state === "playing" && game.messageBox === null) {
+    drawButton(renderer, 8, 16 * 15 + 8, 10, "End turn", true);
   }
 
   //--- end nuke
