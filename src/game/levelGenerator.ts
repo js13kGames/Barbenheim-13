@@ -98,6 +98,7 @@ function createTerrain(tilemap: TileMap, rnd: Random) {
   }
 }
 
+// @ts-ignore
 function createCastle(tilemap: TileMap, objmap: TileMap, rnd: Random) {
   const castleWidth = 6;
   const castleHeight = 8;
